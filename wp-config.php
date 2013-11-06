@@ -13,16 +13,20 @@
  *
  * @package WordPress
  */
+define('WP_SITEURL', 'http://' . $_SERVER['SERVER_NAME'] . '/wordpress');
+define('WP_HOME',    'http://' . $_SERVER['SERVER_NAME']);
+define('WP_CONTENT_DIR', $_SERVER['DOCUMENT_ROOT'] . '/wp-content');
+define('WP_CONTENT_URL', 'http://' . $_SERVER['SERVER_NAME'] . '/wp-content');
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define('DB_NAME', 'database_name_here');
+define('DB_NAME', 'wplearning');
 
 /** MySQL database username */
-define('DB_USER', 'username_here');
+define('DB_USER', 'ediss');
 
 /** MySQL database password */
-define('DB_PASSWORD', 'password_here');
+define('DB_PASSWORD', 'kahva');
 
 /** MySQL hostname */
 define('DB_HOST', 'localhost');
@@ -42,14 +46,14 @@ define('DB_COLLATE', '');
  *
  * @since 2.6.0
  */
-define('AUTH_KEY',         'put your unique phrase here');
-define('SECURE_AUTH_KEY',  'put your unique phrase here');
-define('LOGGED_IN_KEY',    'put your unique phrase here');
-define('NONCE_KEY',        'put your unique phrase here');
-define('AUTH_SALT',        'put your unique phrase here');
-define('SECURE_AUTH_SALT', 'put your unique phrase here');
-define('LOGGED_IN_SALT',   'put your unique phrase here');
-define('NONCE_SALT',       'put your unique phrase here');
+define('AUTH_KEY',         'I*.}fZ5z/|S<tVUKha!o]JRdMkGcLYYZx#9>Fq4d23&S:E)wjQbGBQT/#C/Yc.Qq');
+define('SECURE_AUTH_KEY',  'N`b.*N9FzUv>~L-K)C2UFN~F<O.Qky2}rX~#4-3kSnYI0-89wN0LY$#^?Gw{!PeL');
+define('LOGGED_IN_KEY',    '3kC;0--9j70h_cSE7~o?N/W)F|^(L$38&`x&HWBIRF;Dbfa5SaTEX7]yA8{ `6K;');
+define('NONCE_KEY',        ',u5R+H]2rNAij zU(!CvtTm[tKB|&@N,L(M~cA@ %p;lkQ6WL1;@#}Qq2&WN5CCb');
+define('AUTH_SALT',        '5b~5y>^}m&IDdyzDl[<Ly%<+Xu{Q*e~d~TY*Vp<l#-+f=u{,Vrzwa#v_VsxMU2M$');
+define('SECURE_AUTH_SALT', 'WT?1;bn|lKDV>XJUw.>48@0n64*b7^3)!AG$v2DOb[AtCqfm+pt2$OjzjB?#$<X-');
+define('LOGGED_IN_SALT',   'H}dM8b<eSZ6:hkS^ChOh?J &6x4ctgq*%2$[{ri=+lz<x6!kX5XNDv1~4[|cl_^5');
+define('NONCE_SALT',       '+bJtfvA6a!<Kc>{&0YYt.uZ1+]Kph^R4q1*zeZ`e0rh_h{,I~XE>1zp{O7u!/|H}');
 
 /**#@-*/
 

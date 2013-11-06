@@ -1,0 +1,27 @@
+/*
+Theme Name: MyTheme
+Theme URI: http://kvalitetnije.bin.net.ba
+Author: Edis Selimovic
+Author URI: http://kvalitetnije.bih.net.ba
+Description: Simple, light, fresh theme using twitter bootstrap css framework.
+Version: 1.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Tags: twitter-bootstrap
+Text Domain: mytheme
+
+This theme, like WordPress, is licensed under the GPL.
+Use it to make something cool, have fun, and share what you've learned with others.
+*/
+
+/*MY custtom style*/
+/*navbar*/
+.navbar {
+  border-radius: 0;
+  margin-bottom: 0;
+}
+
+/*carousel*/
+#mytheme-carousel {
+  margin-bottom: 30px;
+}

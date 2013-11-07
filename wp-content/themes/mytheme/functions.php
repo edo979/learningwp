@@ -3,6 +3,9 @@
 // Some constants
 define(TEMPLATEDIR, get_template_directory_uri());
 
+// Register custom navigation walker for bootstrap meny
+require_once('wp_bootstrap_navwalker.php');
+
 function mytheme_setup()
 {
   //load_theme_textdomain( 'twentytwelve', get_template_directory() . '/languages' );
@@ -10,9 +13,6 @@ function mytheme_setup()
   register_nav_menu('primary', __('Primary navigation', 'mytheme'));
 }
 add_action('after_setup_theme', 'mytheme_setup');
-
-// Register custom navigation walker for bootstrap meny
-require_once('wp_bootstrap_navwalker.php');
 
 function myteme_scripts_styles()
 {

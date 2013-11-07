@@ -6,9 +6,21 @@ define(TEMPLATEDIR, get_template_directory_uri());
 // Register custom navigation walker for bootstrap meny
 require_once('wp_bootstrap_navwalker.php');
 
+/**
+ * My Theme setup.
+ *
+ * Sets up theme defaults and registers the various WordPress features that
+ * Twenty Twelve supports.
+ *
+ * @uses load_theme_textdomain() For translation/localization support.
+ */
 function mytheme_setup()
 {
   //load_theme_textdomain( 'twentytwelve', get_template_directory() . '/languages' );
+  
+  // This theme supports a variety of post formats.
+	add_theme_support( 'post-formats', array( 'aside', 'image', 'link', 'quote', 'status' ) );
+  
   // This theme uses wp_nav_menu() in one location.
   register_nav_menu('primary', __('Primary navigation', 'mytheme'));
 }

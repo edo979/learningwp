@@ -18,16 +18,20 @@ get_header();
 
 <section id="primary" class="site-content container marketing">
   <div id="content" role="main">
+    <div class="row">
+      <div class="col-lg-8">
 
-    <?php if (have_posts()) : ?>
+        <?php if (have_posts()) : ?>
 
-      <?php /* Start the Loop */ ?>
-      <?php while (have_posts()) : the_post(); ?>
-        <?php get_template_part('content', get_post_format()); ?>
-      <?php endwhile; ?>
+          <?php /* Start the Loop */ ?>
+          <?php while (have_posts()) : the_post(); ?>
+            <?php get_template_part('content', get_post_format()); ?>
+          <?php endwhile; ?>
 
-    <?php endif ?>
-
+        <?php endif ?>
+        
+      </div><!-- .col-lg-8	-->
+    </div><!-- .row-->
   </div><!-- #content -->
 </section><!-- #primary -->
 

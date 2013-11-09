@@ -22,35 +22,40 @@
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width">
     <title><?php wp_title('|', true, 'right'); ?></title>
+    <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
     
     <?php wp_head(); ?>
   </head>
 
   <body <?php body_class(); ?>>
-    <nav class="navbar navbar-inverse navbar-static-top" role="navigation"> 
-      <!-- Brand and toggle get grouped for better mobile display --> 
-      <div class="navbar-header"> 
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-ex1-collapse"> 
-          <span class="sr-only">Toggle navigation</span> 
-          <span class="icon-bar"></span> 
-          <span class="icon-bar"></span> 
-          <span class="icon-bar"></span> 
-        </button> 
-        <a class="navbar-brand" href="<?php bloginfo('url') ?>"><?php bloginfo('name') ?></a>
-      </div> 
-      <!-- Collect the nav links, forms, and other content for toggling --> 
-      <div class="collapse navbar-collapse" id="navbar-ex1-collapse">
-        <?php
-        /* Primary navigation */
-        wp_nav_menu(array(
-            'menu'       => 'primary',
-            'theme_location' => 'primary',
-            'depth'      => 2,
-            'container'  => false,
-            'menu_class' => 'nav navbar-nav',
-            //Process nav menu using our custom nav walker
-            'walker'     => new wp_bootstrap_navwalker())
-        );
-        ?>
-      </div>
-    </nav>
+    <div id="main-container" class="container">
+      <header id="main-header" class="row">
+        <section id="header" class="pull-right<?php _e(single_cat_title( '', false ), 'mytheme')?>">
+          <nav class="navbar navbar-default" role="navigation"> 
+            <!-- Brand and toggle get grouped for better mobile display --> 
+            <div class="navbar-header"> 
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-ex1-collapse"> 
+                <span class="sr-only">Toggle navigation</span> 
+                <span class="icon-bar"></span> 
+                <span class="icon-bar"></span> 
+                <span class="icon-bar"></span> 
+              </button> 
+            </div> 
+            <!-- Collect the nav links, forms, and other content for toggling --> 
+            <div class="collapse navbar-collapse" id="navbar-ex1-collapse">
+              <?php
+              /* Primary navigation */
+              wp_nav_menu(array(
+                  'menu'       => 'primary',
+                  'theme_location' => 'primary',
+                  'depth'      => 2,
+                  'container'  => false,
+                  'menu_class' => 'nav navbar-nav',
+                  //Process nav menu using our custom nav walker
+                  'walker'     => new wp_bootstrap_navwalker())
+              );
+              ?>
+            </div>
+          </nav>
+        </section>
+      </header>

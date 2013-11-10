@@ -28,7 +28,9 @@
       <?php endif; ?>
     </section>
     
-    <section id="sidebar" class="col-lg-4"></section><!-- #sidebar -->
+    <aside id="sidebar" class="col-lg-4">
+      <?php get_sidebar(); ?>
+    </aside><!-- #sidebar -->
     
   </div><!-- #main-content -->
   

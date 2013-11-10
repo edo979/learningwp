@@ -71,15 +71,25 @@ function mytheme_scripts_styles()
 add_action('wp_enqueue_scripts', 'mytheme_scripts_styles');
 
 function mytheme_widgets_init()
-{
+{  
+  register_sidebar(array(
+      'name'          => __('Sidebar-Ads', 'mytheme'),
+      'id'            => 'sidebar-1',
+      'description'   => __('Appers in the sidebar, use for advertisment messages', 'mytheme'),
+      'before_widget' => '<div class="sidebar-ads">',
+      'after_widget'  => '</div>',
+      'before_title'  => '<h4>',
+      'after_title'   => '</h4>',
+  ));
+  
   register_sidebar(array(
       'name'          => __('Sidebar', 'mytheme'),
-      'id'            => 'sidebar-right',
+      'id'            => 'sidebar-2',
       'description'   => __('Appers in the sidebar', 'mytheme'),
       'before_widget' => '<div id="%1$s" class="panel panel-default widget %2$s"><div class="panel-body">',
       'after_widget'  => '</div></div>',
-      'before_title'  => '<h3 class="widget-title">',
-      'after_title'   => '</h3>',
+      'before_title'  => '<div class="widget-title label label-primary"><h4>',
+      'after_title'   => '</div></h4>',
   ));
 }
 add_action('widgets_init', 'mytheme_widgets_init');

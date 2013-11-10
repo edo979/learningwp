@@ -99,8 +99,8 @@ header div#header-inner {
       font-style: italic;
     }
   }
-  
-  height: 200px;
+
+  height: 150px;
   background: lightgray;
   padding-left: 15px;
   margin-bottom: 44px;
@@ -115,8 +115,38 @@ body.blog {
   div.panel {
     article {
       img {
-        
         margin-right: 30px !important;
+      }
+    }
+  }
+}
+
+body {
+  background: whitesmoke;
+}
+
+aside#sidebar {
+  div#sidebar-2 {
+    div.widget-area {
+      div.panel-body {
+        position: relative;
+        padding-top: 75px;
+
+        div.widget-title {
+          border-radius: 0;
+          border-bottom: 1px solid green;
+          margin: 0;
+          padding: 0;
+          position: absolute;
+          width: 100%;
+          left: 0;
+          top: 0;
+
+          h4 {
+            margin: 0;
+            padding: 15px;
+          }
+        }
       }
     }
   }

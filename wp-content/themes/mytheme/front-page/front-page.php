@@ -12,10 +12,12 @@
  * @subpackage Twenty_Twelve
  * @since Twenty Twelve 1.0
  */
-get_header();
 
-get_template_part('partials/carousel');
-//get_template_part('partials/firstpage');
+/**
+ * Load custom header for front page, this header have navigation and carousel
+ * 
+ */
+get_template_part('partials/front-page-header');
 
 ?>
 <!-- Marketing messaging and featurettes

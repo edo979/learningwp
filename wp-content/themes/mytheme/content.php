@@ -8,23 +8,31 @@
  * @subpackage Twenty_Thirteen
  * @since Twenty Thirteen 1.0
  */
+
+// Some variables
+// Widith column of image in blog page
+$leftColumnSize = 'col-lg-3 col-md-2 col-sm-2 hidden-xs';
+$rightColumnSize = 'col-lg-9 col-md-10 col-sm-10';
 ?>
 
 <div class="panel panel-default">
   <div class="panel-body">
-    <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+    <article id="post-<?php the_ID(); ?>" <?php post_class('row'); ?>>
 
-      <!--<img src="" alt="" class="pull-left thumbnail">-->
       <?php if (has_post_thumbnail() && !post_password_required()) : ?>
-        <?php the_post_thumbnail('thumbnail', array('class' => 'pull-left thumbnail')); ?>
+        <div class="post-feature-image <?php echo $leftColumnSize ?>">
+          <?php the_post_thumbnail('thumbnail', array('class' => 'thumbnail')); ?>
+        </div>
       <?php else : ?>
         <?php 
           // show default image for category
         ?>
-      <img src="" alt="" style="height:150px; width: 150px;"class="pull-left thumbnail">
+      <div class="post-feature-image <?php echo $leftColumnSize ?>">
+        <img src="" alt="" style="width: 150px; height: 150px;" class="thumbnail">
+      </div>
       <?php endif; ?>
 
-      <header class="entry-header">
+      <header class="entry-header <?php echo $rightColumnSize ?>">
         <h1 class="entry-title">
           <a href="<?php the_permalink(); ?>" rel="bookmark"><?php the_title(); ?></a>
         </h1>

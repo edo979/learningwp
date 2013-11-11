@@ -113,9 +113,58 @@ header div#header-inner {
 
 body.blog {
   div.panel {
-    article {
+    article.post.type-post {
       img {
-        margin-right: 30px !important;
+        //margin-right: 30px !important;
+      }
+
+      header {
+        postition: relateive;
+
+        div.entry-meta {
+          a {
+            color: white;
+          }
+
+          .panel {
+            display: inline;
+            padding: .2em .6em .3em;
+            font-size: 75%;
+            font-weight: bold;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: .25em;
+          }
+          span.featured-post {
+            position: absolute;
+            top: 0;
+            right: 15px;
+          }
+          span.edit-link {
+            position: absolute;
+            bottom: 0;
+            right: 15px;
+            
+            a {
+              .panel;
+              background-color: #007fff;
+            }            
+          }
+          span.categories-links {
+            a {
+              .panel;
+              background-color: #3fb618;
+            }
+          }
+          span.tags-links {
+            a {
+              .panel;
+              background-color: #ff7518;
+            }
+          }
+        }
       }
     }
   }

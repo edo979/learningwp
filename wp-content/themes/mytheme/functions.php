@@ -71,7 +71,7 @@ function mytheme_scripts_styles()
 add_action('wp_enqueue_scripts', 'mytheme_scripts_styles');
 
 function mytheme_widgets_init()
-{  
+{
   register_sidebar(array(
       'name'          => __('Sidebar-Ads', 'mytheme'),
       'id'            => 'sidebar-1',
@@ -81,7 +81,7 @@ function mytheme_widgets_init()
       'before_title'  => '<h4>',
       'after_title'   => '</h4>',
   ));
-  
+
   register_sidebar(array(
       'name'          => __('Sidebar', 'mytheme'),
       'id'            => 'sidebar-2',
@@ -92,6 +92,7 @@ function mytheme_widgets_init()
       'after_title'   => '</div></h4>',
   ));
 }
+
 add_action('widgets_init', 'mytheme_widgets_init');
 
 
@@ -119,11 +120,11 @@ if (!function_exists('mytheme_paging_nav')) :
 
         <?php if (get_next_posts_link()) : ?>
           <div class="nav-previous"><?php next_posts_link(__('<span class="meta-nav">&larr;</span> Older posts', 'mytheme')); ?></div>
-    <?php endif; ?>
+        <?php endif; ?>
 
-    <?php if (get_previous_posts_link()) : ?>
+        <?php if (get_previous_posts_link()) : ?>
           <div class="nav-next"><?php previous_posts_link(__('Newer posts <span class="meta-nav">&rarr;</span>', 'mytheme')); ?></div>
-    <?php endif; ?>
+        <?php endif; ?>
 
       </div><!-- .nav-links -->
     </nav><!-- .navigation -->
@@ -139,38 +140,48 @@ if (!function_exists('mytheme_entry_meta')) :
   /**
    * Print HTML with meta information for current post: categories, tags, permalink, author, and date.
    *
-   * @since Twenty Thirteen 1.0
+   * @since Mytheme 1.0
    *
    * @return void
    */
   function mytheme_entry_meta()
   {
-    if (is_sticky() && is_home() && !is_paged())
-      echo '<span class="featured-post">' . __('Sticky', 'mytheme') . '</span>';
+    // check is post not page or other
+    $post = 'post' == get_post_type();
 
-    if (!has_post_format('link') && 'post' == get_post_type())
+    // Format Post Author
+    if ($post)
+    {
+      $author = get_the_author();
+      
+      printf('<span class="author vcard label label-primary"><a class="url fn n" href="%1$s" title="%2$s" rel="author">%3$s</a></span>', esc_url(get_author_posts_url(get_the_author_meta('ID'))), esc_attr(sprintf(__('View all posts by %s', 'mytheme'), $author)), $author
+      );
+      echo '<span>&nbsp' . __('on', 'mytheme') . '&nbsp</span>';
+    }
+
+    // Format Date
+    if (!has_post_format('link') && $post)
       mytheme_entry_date();
 
+    // Format Categories
     // Translators: used between list items, there is a space after the comma.
-    $categories_list = get_the_category_list(__(', ', 'mytheme'));
+    $categories_list = get_the_category_list('&nbsp');
     if ($categories_list)
     {
+      echo '<span>&nbsp' . __('in', 'mytheme') . '&nbsp</span>';
       echo '<span class="categories-links">' . $categories_list . '</span>';
     }
-
-    // Translators: used between list items, there is a space after the comma.
-    $tag_list = get_the_tag_list('', __(', ', 'mytheme'));
+    
+    // Format Tags
+    $tag_list = get_the_tag_list('','&nbsp');
     if ($tag_list)
     {
-      echo '<span class="tags-links">' . $tag_list . '</span>';
+      echo '<br>';
+      echo '<span>' . __('Tags', 'mytheme') . ':&nbsp</span><span class="tags-links">' . $tag_list . '</span>';
     }
-
-    // Post author
-    if ('post' == get_post_type())
-    {
-      printf('<span class="author vcard"><a class="url fn n" href="%1$s" title="%2$s" rel="author">%3$s</a></span>', esc_url(get_author_posts_url(get_the_author_meta('ID'))), esc_attr(sprintf(__('View all posts by %s', 'mytheme'), get_the_author())), get_the_author()
-      );
-    }
+    // Format Sticky
+    if (is_sticky() && is_home() && !is_paged())
+      echo '<span class="featured-post">' . __('Sticky', 'mytheme') . '</span>';
   }
 
 endif;
@@ -194,7 +205,7 @@ if (!function_exists('mytheme_entry_date')) :
     else
       $format_prefix = '%2$s';
 
-    $date = sprintf('<span class="date"><a href="%1$s" title="%2$s" rel="bookmark"><time class="entry-date" datetime="%3$s">%4$s</time></a></span>', esc_url(get_permalink()), esc_attr(sprintf(__('Permalink to %s', 'mytheme'), the_title_attribute('echo=0'))), esc_attr(get_the_date('c')), esc_html(sprintf($format_prefix, get_post_format_string(get_post_format()), get_the_date()))
+    $date = sprintf('<span class="date label label-primary"><a href="%1$s" title="%2$s" rel="bookmark"><time class="entry-date" datetime="%3$s">%4$s</time></a></span>', esc_url(get_permalink()), esc_attr(sprintf(__('Permalink to %s', 'mytheme'), the_title_attribute('echo=0'))), esc_attr(get_the_date('c')), esc_html(sprintf($format_prefix, get_post_format_string(get_post_format()), get_the_date()))
     );
 
     if ($echo)

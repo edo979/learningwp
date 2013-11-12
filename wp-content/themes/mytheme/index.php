@@ -18,7 +18,7 @@
 <?php get_header(); ?>
 
   <div id="content" class="site-content row" role="main">
-    <section id="main-column" class="col-lg-8">
+    <section id="main-column" class="col-lg-8 col-md-8">
       <?php if (have_posts()) : ?>
         <?php while (have_posts()) : the_post(); ?>
           <?php get_template_part('content', get_post_format()); ?>
@@ -28,7 +28,7 @@
       <?php endif; ?>
     </section>
     
-    <aside id="sidebar" class="col-lg-4">
+    <aside id="sidebar" class="col-lg-4 col-md-4">
       <?php get_sidebar(); ?>
     </aside><!-- #sidebar -->
     

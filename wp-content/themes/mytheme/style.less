@@ -90,20 +90,28 @@ video {
 -------------------------------------------------------------- */
 
 /*header on top of page*/
-header div#header-inner {
-  section#logo {
+header div#header-container {
+  height: 150px;
+  background: lightgray;
+  padding-left: 15px;
+  margin-bottom: 44px;
+
+  div#header-logo {
     h1 {
-      margin-bottom: -7px;
+      margin-bottom: -5px;
     }
     p {
       font-style: italic;
     }
   }
 
-  height: 150px;
-  background: lightgray;
-  padding-left: 15px;
-  margin-bottom: 44px;
+  div#header-subnav {
+    padding-right: 20px;
+  }
+
+  div#header-searchbar {
+    padding-left: 10px;
+  }
 }
 
 /*carousel*/
@@ -111,7 +119,7 @@ header div#header-inner {
   margin-bottom: 30px;
 }
 
-body.blog {
+body.blog, body.single-post {
   div.panel {
     article.post.type-post {
       img {
@@ -146,7 +154,7 @@ body.blog {
             position: absolute;
             bottom: 0;
             right: 15px;
-            
+
             a {
               .panel;
               background-color: #007fff;

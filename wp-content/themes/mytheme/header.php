@@ -30,39 +30,53 @@
   <body <?php body_class(); ?>>
     <div id="main-container" class="container">
       <header id="main-header" class="row <?php _e(single_cat_title('', false), 'mytheme') ?>">
-        <div class="col-lg-12 clearfix">
-          <div id="header-inner">
-            <section id="logo" class="pull-left">
-              <h1>Virtual School</h1>
-              <p class="text-muted small-text">Learning and education web page</p>
-            </section>
+        <div class="col-lg-12">
+          <div id="header-container">
 
-            <nav class="navbar navbar-default pull-right" role="navigation"> 
-              <!-- Brand and toggle get grouped for better mobile display --> 
-              <div class="navbar-header"> 
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-ex1-collapse"> 
-                  <span class="sr-only">Toggle navigation</span> 
-                  <span class="icon-bar"></span> 
-                  <span class="icon-bar"></span> 
-                  <span class="icon-bar"></span> 
-                </button> 
-              </div> 
-              <!-- Collect the nav links, forms, and other content for toggling --> 
-              <div class="collapse navbar-collapse" id="navbar-ex1-collapse">
-                <?php
-                /* Primary navigation */
-                wp_nav_menu(array(
-                    'menu'           => 'primary',
-                    'theme_location' => 'primary',
-                    'depth'          => 2,
-                    'container'      => false,
-                    'menu_class'     => 'nav navbar-nav',
-                    //Process nav menu using our custom nav walker
-                    'walker'         => new wp_bootstrap_navwalker())
-                );
-                ?>
-              </div>
-            </nav>
-          </div>
-        </div><!--.col-lg-12 -->
+            <section id="header-top" class="row">
+              <div id="header-logo" class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <h1>Virtual School</h1>
+                <p class="text-muted small-text">Learning and education web page</p>
+              </div><!-- #header-logo -->
+              <div id="header-nav" class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <nav class="navbar navbar-inverse pull-right" role="navigation"> 
+                  <!-- Brand and toggle get grouped for better mobile display --> 
+                  <div class="navbar-header"> 
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-ex1-collapse"> 
+                      <span class="sr-only">Toggle navigation</span> 
+                      <span class="icon-bar"></span> 
+                      <span class="icon-bar"></span> 
+                      <span class="icon-bar"></span> 
+                    </button> 
+                  </div> 
+                  <!-- Collect the nav links, forms, and other content for toggling --> 
+                  <div class="collapse navbar-collapse" id="navbar-ex1-collapse">
+                    <?php
+                    /* Primary navigation */
+                    wp_nav_menu(array(
+                        'menu'           => 'primary',
+                        'theme_location' => 'primary',
+                        'depth'          => 2,
+                        'container'      => false,
+                        'menu_class'     => 'nav navbar-nav',
+                        //Process nav menu using our custom nav walker
+                        'walker'         => new wp_bootstrap_navwalker())
+                    );
+                    ?>
+                  </div>
+                </nav>
+              </div><!-- #header-nav -->
+            </section><!-- #header-top -->
+
+            <section id="header-bottom" class="row">
+              <div id="header-subnav" class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                <div class="pull-right">submeny</div>
+              </div><!-- #header-subnav -->
+              <div id="header-searchbar" class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                <?php get_search_form(); ?>
+              </div><!-- #header-searchbar -->
+            </section><!-- header-bottom -->
+
+          </div><!-- #header-container -->
+        </div><!-- .col-lg-12 -->
       </header>

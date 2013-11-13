@@ -38,6 +38,7 @@
                 <h1>Virtual School</h1>
                 <p class="text-muted small-text">Learning and education web page</p>
               </div><!-- #header-logo -->
+              
               <div id="header-nav" class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <nav class="navbar navbar-inverse pull-right" role="navigation"> 
                   <!-- Brand and toggle get grouped for better mobile display --> 
@@ -72,7 +73,8 @@
               <div id="header-subnav" class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                 <div class="pull-right">submeny</div>
               </div><!-- #header-subnav -->
-              <div id="header-searchbar" class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+              
+              <div id="header-searchbar" class="col-lg-4 col-md-4 col-sm-4 hidden-xs">
                 <?php get_search_form(); ?>
               </div><!-- #header-searchbar -->
             </section><!-- header-bottom -->

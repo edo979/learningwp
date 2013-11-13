@@ -53,7 +53,6 @@ function mytheme_setup()
   add_theme_support('post-thumbnails');
   set_post_thumbnail_size(604, 270, true);
 }
-
 add_action('after_setup_theme', 'mytheme_setup');
 
 /**
@@ -73,7 +72,6 @@ function mytheme_scripts_styles()
   // Loads our main stylesheet.
   wp_enqueue_style('style.css', get_stylesheet_uri());
 }
-
 add_action('wp_enqueue_scripts', 'mytheme_scripts_styles');
 
 function mytheme_widgets_init()
@@ -98,7 +96,6 @@ function mytheme_widgets_init()
       'after_title'   => '</div></h4>',
   ));
 }
-
 add_action('widgets_init', 'mytheme_widgets_init');
 
 
@@ -221,4 +218,17 @@ if (!function_exists('mytheme_entry_date')) :
   }
 
 endif;
+
+
+
+/**
+ * Make the "read more" link to the post
+ * 
+ * @param type $more
+ * @return string
+ */
+function new_excerpt_more( $more ) {
+	return '<br><a class="read-more" href="'. get_permalink( get_the_ID() ) . '" title="' . __('Read more', 'mytheme') . '">[ ... ]</a>';
+}
+add_filter( 'excerpt_more', 'new_excerpt_more' );
 ?>

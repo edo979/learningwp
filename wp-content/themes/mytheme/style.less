@@ -119,9 +119,12 @@ header div#header-container {
   margin-bottom: 30px;
 }
 
-body.blog, body.single-post {
+body.blog,
+body.single-post,
+body.search{
   div.panel {
-    article.post.type-post {
+    article.post.type-post,
+    article.page.type-page {
       img {
         //margin-right: 30px !important;
       }
@@ -148,11 +151,11 @@ body.blog, body.single-post {
           span.featured-post {
             position: absolute;
             top: 0;
-            right: 15px;
+            left: 25%;
           }
           span.edit-link {
             position: absolute;
-            bottom: 0;
+            top: 0;
             right: 15px;
 
             a {

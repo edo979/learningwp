@@ -31,7 +31,7 @@ $rightColumnSize = 'col-lg-9 col-md-10 col-sm-10';
                   <img src="" alt="" style="width: 150px; height: 150px;" class="thumbnail pull-left post-feature-image <?php echo $leftColumnSize ?>">
                 <?php endif; ?>
               </div><!-- .post-feature-image -->
-                
+
               <div class="post-header <?php echo $rightColumnSize ?>">
                 <h1>
                   <?php the_title(); ?>
@@ -40,15 +40,23 @@ $rightColumnSize = 'col-lg-9 col-md-10 col-sm-10';
                   <?php mytheme_entry_meta(); ?>
                   <?php edit_post_link(__('Edit', 'mytheme'), '<span class="edit-link">', '</span>'); ?>
                 </div><!-- .entry-meta -->
-             </div><!-- .post-header -->
-             
+              </div><!-- .post-header -->
+
             </header><!-- .entry-header -->
 
             <hr class="">
 
-            <section class="entry-content">
-              <?php the_content(__('Continue reading <span class="meta-nav">&rarr;</span>', 'mytheme')); ?>
+            <section class="entry-content row">
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <?php get_template_part('content', get_post_format()); ?>
+              </div>
             </section>
+
+            <footer class="row">
+              <div class="page-navigation col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <?php wp_link_pages(array('before' => '<div class="page-links"><span class="page-links-title">' . __('Pages:', 'twentythirteen') . '</span>', 'after' => '</div>', 'link_before' => '<span>', 'link_after' => '</span>')); ?>
+              </div>
+            </footer>
           </article><!-- #post -->
         </div><!-- .panel-body -->
       </div><!-- .panel-default -->

@@ -198,6 +198,18 @@ body.single-post {
 
 body {
   background: whitesmoke;
+  blockquote {
+    p {
+      font-style: italic;
+    }
+    cite {
+      &:before {
+        content: '';
+        display: block;
+        margin-top: 15px;
+      } 
+    }
+  }
 }
 
 aside#sidebar {

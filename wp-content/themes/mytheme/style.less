@@ -119,78 +119,70 @@ header div#header-container {
   margin-bottom: 30px;
 }
 
-body.blog,
-body.single-post,
-body.search{
+body {
   div.panel {
-    article.post.type-post,
-    article.page.type-page {
-      img {
-        //margin-right: 30px !important;
-      }
+    header {
+      postition: relateive;
 
-      header {
-        postition: relateive;
+      div.entry-meta {
+        a {
+          color: white;
+        }
 
-        div.entry-meta {
+        .panel {
+          display: inline;
+          padding: .2em .6em .3em;
+          font-size: 75%;
+          font-weight: bold;
+          line-height: 1;
+          text-align: center;
+          white-space: nowrap;
+          vertical-align: baseline;
+          border-radius: .25em;
+        }
+        span.featured-post {
+          position: absolute;
+          top: 0;
+          left: 25%;
+        }
+        span.edit-link {
+          position: absolute;
+          top: 0;
+          right: 15px;
+
           a {
-            color: white;
+            .panel;
+            background-color: #007fff;
+          }            
+        }
+        span.categories-links {
+          a {
+            .panel;
+            background-color: #3fb618;
           }
-
-          .panel {
-            display: inline;
-            padding: .2em .6em .3em;
-            font-size: 75%;
-            font-weight: bold;
-            line-height: 1;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: baseline;
-            border-radius: .25em;
-          }
-          span.featured-post {
-            position: absolute;
-            top: 0;
-            left: 25%;
-          }
-          span.edit-link {
-            position: absolute;
-            top: 0;
-            right: 15px;
-
-            a {
-              .panel;
-              background-color: #007fff;
-            }            
-          }
-          span.categories-links {
-            a {
-              .panel;
-              background-color: #3fb618;
-            }
-          }
-          span.tags-links {
-            a {
-              .panel;
-              background-color: #ff7518;
-            }
+        }
+        span.tags-links {
+          a {
+            .panel;
+            background-color: #ff7518;
           }
         }
       }
     }
-    article.post.format-gallery {
-      section.entry-content {
-        img {
-          width: 150px;
-          height: 150px;
-          margin-right: 5px;
-        }
+  }
+  article.post.format-gallery {
+    section.entry-content {
+      img {
+        width: 150px;
+        height: 150px;
+        margin-right: 5px;
       }
     }
   }
 }
 
-body.single-post {
+body.single-post,
+body.page {
   section.entry-content {
     padding: 15px 30px;
   }

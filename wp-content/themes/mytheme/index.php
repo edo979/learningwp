@@ -56,17 +56,15 @@ $rightColumnSize = 'col-lg-9 col-md-10 col-sm-10';
                       <?php mytheme_entry_meta(); ?>
                       <?php edit_post_link(__('Edit', 'mytheme'), '<span class="edit-link">', '</span>'); ?>
                     </div><!-- .entry-meta -->
+                    
+                    <hr>
+                    
+                    <div class="excerpt">
+                       <?php the_excerpt(); ?>
+                    </div><!-- .excerpt -->
+                    
                   </div><!-- .entry-header -->
                 </header><!-- .row -->
-
-                <?php if (is_search()) : // Only display Excerpts for Search  ?>
-                  <section class="row">
-                    <div class="entry-summary col-lg-12">
-                      <hr>
-                      <?php the_excerpt(); ?>
-                    </div><!-- .entry-summary -->
-                  </section><!-- .row -->
-                <?php endif; ?>
 
                 <footer class="entry-meta">
                   <?php if (comments_open() && !is_single()) : ?>

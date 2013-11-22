@@ -35,10 +35,10 @@ function mytheme_setup()
   load_theme_textdomain('mytheme', get_template_directory() . '/languages');
 
   /*
-	 * Switches default core markup for search form, comment form,
-	 * and comments to output valid HTML5.
-	 */
-	add_theme_support( 'html5', array( 'search-form', 'comment-form', 'comment-list' ) );
+   * Switches default core markup for search form, comment form,
+   * and comments to output valid HTML5.
+   */
+  add_theme_support('html5', array('search-form', 'comment-form', 'comment-list'));
 
   // This theme supports a variety of post formats.
   add_theme_support('post-formats', array('aside', 'image', 'link', 'quote', 'status'));
@@ -53,6 +53,7 @@ function mytheme_setup()
   add_theme_support('post-thumbnails');
   set_post_thumbnail_size(604, 270, true);
 }
+
 add_action('after_setup_theme', 'mytheme_setup');
 
 /**
@@ -72,6 +73,7 @@ function mytheme_scripts_styles()
   // Loads our main stylesheet.
   wp_enqueue_style('style.css', get_stylesheet_uri());
 }
+
 add_action('wp_enqueue_scripts', 'mytheme_scripts_styles');
 
 function mytheme_widgets_init()
@@ -96,6 +98,7 @@ function mytheme_widgets_init()
       'after_title'   => '</div></h4>',
   ));
 }
+
 add_action('widgets_init', 'mytheme_widgets_init');
 
 
@@ -156,7 +159,7 @@ if (!function_exists('mytheme_entry_meta')) :
     if ($post)
     {
       $author = get_the_author();
-      
+
       printf('<span class="author vcard label label-primary"><a class="url fn n" href="%1$s" title="%2$s" rel="author">%3$s</a></span>', esc_url(get_author_posts_url(get_the_author_meta('ID'))), esc_attr(sprintf(__('View all posts by %s', 'mytheme'), $author)), $author
       );
       echo '<span>&nbsp' . __('on', 'mytheme') . '&nbsp</span>';
@@ -174,9 +177,9 @@ if (!function_exists('mytheme_entry_meta')) :
       echo '<span>&nbsp' . __('in', 'mytheme') . '&nbsp</span>';
       echo '<span class="categories-links">' . $categories_list . '</span>';
     }
-    
+
     // Format Tags
-    $tag_list = get_the_tag_list('','&nbsp');
+    $tag_list = get_the_tag_list('', '&nbsp');
     if ($tag_list)
     {
       echo '<br>';
@@ -221,73 +224,74 @@ endif;
 
 
 
-if ( ! function_exists( 'mytheme_the_attached_image' ) ) :
-/**
- * Print the attached image with a link to the next attached image.
- *
- * @since Twenty Thirteen 1.0
- *
- * @return void
- */
-function mytheme_the_attached_image() {
-	/**
-	 * Filter the image attachment size to use.
-	 *
-	 * @since Twenty thirteen 1.0
-	 *
-	 * @param array $size {
-	 *     @type int The attachment height in pixels.
-	 *     @type int The attachment width in pixels.
-	 * }
-	 */
-	$attachment_size     = apply_filters( 'mytheme_attachment_size', array( 724, 724 ) );
-	$next_attachment_url = wp_get_attachment_url();
-	$post                = get_post();
+if (!function_exists('mytheme_the_attached_image')) :
 
-	/*
-	 * Grab the IDs of all the image attachments in a gallery so we can get the URL
-	 * of the next adjacent image in a gallery, or the first image (if we're
-	 * looking at the last image in a gallery), or, in a gallery of one, just the
-	 * link to that image file.
-	 */
-	$attachment_ids = get_posts( array(
-		'post_parent'    => $post->post_parent,
-		'fields'         => 'ids',
-		'numberposts'    => -1,
-		'post_status'    => 'inherit',
-		'post_type'      => 'attachment',
-		'post_mime_type' => 'image',
-		'order'          => 'ASC',
-		'orderby'        => 'menu_order ID'
-	) );
+  /**
+   * Print the attached image with a link to the next attached image.
+   *
+   * @since Twenty Thirteen 1.0
+   *
+   * @return void
+   */
+  function mytheme_the_attached_image()
+  {
+    /**
+     * Filter the image attachment size to use.
+     *
+     * @since Twenty thirteen 1.0
+     *
+     * @param array $size {
+     *     @type int The attachment height in pixels.
+     *     @type int The attachment width in pixels.
+     * }
+     */
+    $attachment_size = apply_filters('mytheme_attachment_size', array(724, 724));
+    $next_attachment_url = wp_get_attachment_url();
+    $post = get_post();
 
-	// If there is more than 1 attachment in a gallery...
-	if ( count( $attachment_ids ) > 1 ) {
-		foreach ( $attachment_ids as $attachment_id ) {
-			if ( $attachment_id == $post->ID ) {
-				$next_id = current( $attachment_ids );
-				break;
-			}
-		}
+    /*
+     * Grab the IDs of all the image attachments in a gallery so we can get the URL
+     * of the next adjacent image in a gallery, or the first image (if we're
+     * looking at the last image in a gallery), or, in a gallery of one, just the
+     * link to that image file.
+     */
+    $attachment_ids = get_posts(array(
+        'post_parent'    => $post->post_parent,
+        'fields'         => 'ids',
+        'numberposts'    => -1,
+        'post_status'    => 'inherit',
+        'post_type'      => 'attachment',
+        'post_mime_type' => 'image',
+        'order'          => 'ASC',
+        'orderby'        => 'menu_order ID'
+    ));
 
-		// get the URL of the next image attachment...
-		if ( $next_id )
-			$next_attachment_url = get_attachment_link( $next_id );
+    // If there is more than 1 attachment in a gallery...
+    if (count($attachment_ids) > 1)
+    {
+      foreach ($attachment_ids as $attachment_id)
+      {
+        if ($attachment_id == $post->ID)
+        {
+          $next_id = current($attachment_ids);
+          break;
+        }
+      }
 
-		// or get the URL of the first image attachment.
-		else
-			$next_attachment_url = get_attachment_link( array_shift( $attachment_ids ) );
-	}
+      // get the URL of the next image attachment...
+      if ($next_id)
+        $next_attachment_url = get_attachment_link($next_id);
 
-	printf( '<a href="%1$s" title="%2$s" rel="attachment">%3$s</a>',
-		esc_url( $next_attachment_url ),
-		the_title_attribute( array( 'echo' => false ) ),
-		wp_get_attachment_image( $post->ID, $attachment_size )
-	);
-}
+      // or get the URL of the first image attachment.
+      else
+        $next_attachment_url = get_attachment_link(array_shift($attachment_ids));
+    }
+
+    printf('<a href="%1$s" title="%2$s" rel="attachment">%3$s</a>', esc_url($next_attachment_url), the_title_attribute(array('echo' => false)), wp_get_attachment_image($post->ID, $attachment_size)
+    );
+  }
+
 endif;
-
-
 
 /**
  * Make the "read more" link to the post
@@ -295,12 +299,78 @@ endif;
  * @param type $more
  * @return string
  */
-function new_excerpt_more( $more ) {
-	return '<br><a class="read-more" href="'. get_permalink( get_the_ID() ) . '" title="' . __('Read more', 'mytheme') . '">[ ... ]</a>';
+function new_excerpt_more($more)
+{
+  return '<br><a class="read-more" href="' . get_permalink(get_the_ID()) . '" title="' . __('Read more', 'mytheme') . '">[ ... ]</a>';
 }
-add_filter( 'excerpt_more', 'new_excerpt_more' );
-function custom_excerpt_length( $length ) {
-	return 25;
+
+add_filter('excerpt_more', 'new_excerpt_more');
+
+function custom_excerpt_length($length)
+{
+  return 25;
 }
-add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
+
+add_filter('excerpt_length', 'custom_excerpt_length', 999);
+
+
+
+/**
+ * Excersise custom post
+ */
+add_action('init', 'esse_register_my_popst_type');
+
+function esse_register_my_popst_type()
+{
+  $labels = array(
+      'name'               => 'Products',
+      'singular_name'      => 'Product',
+      'add_new'            => 'Add New Product',
+      'add_new_item'       => 'Add New Product',
+      'edit_item'          => 'Edit Product',
+      'new_item'           => 'New Product',
+      'all_items'          => 'All Products',
+      'view_item'          => 'View Product',
+      'search_items'       => 'Search Products',
+      'not_found'          => 'No products found',
+      'not_found_in_trash' => 'No products found in Trash',
+      'parent_item_colon'  => '',
+      'menu_name'          => 'Products',
+  );
+  $args = array(
+      'labels' => $labels,
+      'public' => true,
+      'supports' => array( 'title', 'editor', 'author', 'thumbnail', 'comments','custom-fields' )
+  );
+  register_post_type('products', $args);
+}
+
+/**
+ * Excersise taxonomy
+ */
+add_action('init', 'esse_define_product_type_taxonomy');
+
+function esse_define_product_type_taxonomy()
+{
+  $labels = array(
+      'name'              => 'Type',
+      'singular_name'     => 'Types',
+      'search_items'      => 'Search Types',
+      'all_items'         => 'All Types',
+      'parent_item'       => 'Parent Type',
+      'parent_item_colon' => 'Parent Type:',
+      'edit_item'         => 'Edit Type',
+      'update_item'       => 'Update Type',
+      'add_new_item'      => 'Add New Type',
+      'new_item_name'     => 'New Type Name',
+      'menu_name'         => 'Type'
+  );
+  $args = array(
+      'labels'       => $labels,
+      'hierarchical' => true,
+      'query_var'    => true,
+      'rewrite'      => true
+  );
+  register_taxonomy('type', 'products', $args);
+}
 ?>

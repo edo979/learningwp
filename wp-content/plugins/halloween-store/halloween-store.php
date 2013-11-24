@@ -32,7 +32,7 @@ function halloween_store_install()
       'currency_sign' => '$'
   );
 
-//save our default option values
+  //save our default option values
   update_option('halloween_options', $hween_options_arr);
 }
 
@@ -119,22 +119,282 @@ function halloween_store_settings_page()
     </form>
   </div>
   <?php
-  // Action hook to register the plugin option settings
-  add_action('admin_init', 'halloween_store_register_settings');
+}
 
-  function halloween_store_register_settings()
+// Action hook to register the plugin option settings
+add_action('admin_init', 'halloween_store_register_settings');
+
+function halloween_store_register_settings()
+{
+  //register the array of settings
+  register_setting('halloween-settings-group', 'halloween_options', 'halloween_sanitize_options');
+}
+
+function halloween_sanitize_options($options)
+{
+  $options['show_inventory'] = (!empty($options['show_inventory']) ) ?
+    sanitize_text_field($options['show_inventory']) : '';
+  $options['currency_sign'] = (!empty($options['currency_sign']) ) ?
+    sanitize_text_field($options['currency_sign']) : '';
+  return $options;
+}
+
+//Action hook to register the Products meta box
+add_action('add_meta_boxes', 'halloween_store_register_meta_box');
+
+function halloween_store_register_meta_box()
+{
+  // create our custom meta box
+  add_meta_box('halloween-product-meta', __('Product Information', 'halloween-plugin'), 'halloween_meta_box', 'halloween-products', 'side', 'default');
+}
+
+//build product meta box
+function halloween_meta_box($post)
+{
+  // retrieve our custom meta box values
+  $hween_sku = get_post_meta($post->ID, '_halloween_product_sku', true);
+  $hween_price = get_post_meta($post->ID, '_halloween_product_price', true);
+  $hween_weight = get_post_meta($post->ID, '_halloween_product_weight', true);
+  $hween_color = get_post_meta($post->ID, '_halloween_product_color', true);
+  $hween_inventory = get_post_meta($post->ID, '_halloween_product_inventory', true);
+
+  //nonce field for security
+  wp_nonce_field('meta-box-save', 'halloween-plugin');
+
+  // display meta box form
+  echo '<table>';
+  echo '<tr>';
+  echo '<td>' . __('Sku', 'halloween-plugin') . ':</td>
+      <td><input type="text" name="halloween_product_sku"
+      value="' . esc_attr($hween_sku) . '" size="10"></td>';
+  echo '</tr><tr>';
+  echo '<td>' . __('Price', 'halloween-plugin') . ':</td>
+      <td><input type="text" name="halloween_product_price"
+      value="' . esc_attr($hween_price) . '" size="5"></td>';
+  echo '</tr><tr>';
+  echo '<td>' . __('Weight', 'halloween-plugin') . ':</td>
+      <td><input type="text" name="halloween_product_weight"
+      value="' . esc_attr($hween_weight) . '" size="5"></td>';
+  echo '</tr><tr>';
+  echo '<td>' . __('Color', 'halloween-plugin') . ':</td>
+      <td><input type="text" name="halloween_product_color"
+      value="' . esc_attr($hween_color) . '" size="5"></td>';
+  echo '</tr><tr>';
+  echo '<td>Inventory:</td>
+      <td><select name="halloween_product_inventory"
+      id="halloween_product_inventory">
+      <option value="In Stock"'
+  . selected($hween_inventory, 'In Stock', false) . '>'
+  . __('In Stock', 'halloween-plugin') . '</option>
+      <option value="Backordered"'
+  . selected($hween_inventory, 'Backordered', false) . '>'
+  . __('Backordered', 'halloween-plugin') . '</option>
+      <option value="Out of Stock"'
+  . selected($hween_inventory, 'Out of Stock', false) . '>'
+  . __('Out of Stock', 'halloween-plugin') . '</option>
+      <option value="Discontinued"'
+  . selected($hween_inventory, 'Discontinued', false) . '>'
+  . __('Discontinued', 'halloween-plugin') . '</option>
+      </select></td>';
+  echo '</tr>';
+
+  //display the meta box shortcode legend section
+  echo '<tr><td colspan="2"><hr></td></tr>';
+  echo '<tr><td colspan="2"><strong>'
+  . __('Shortcode Legend', 'halloween-plugin') . '</strong></td></tr>';
+  echo '<tr><td>' . __('Sku', 'halloween-plugin') . ':
+      </td><td>[hs show=sku]</td></tr>';
+  echo '<tr><td>' . __('Price', 'halloween-plugin') . ':
+      </td><td>[hs show=price]</td></tr>';
+  echo '<tr><td>' . __('Weight', 'halloween-plugin') . ':
+      </td><td>[hs show=weight]</td></tr>';
+  echo '<tr><td>' . __('Color', 'halloween-plugin') . ':
+      </td><td>[hs show=color]</td></tr>';
+  echo '<tr><td>' . __('Inventory', 'halloween-plugin') . ':
+      </td><td>[hs show=inventory]</td></tr>';
+  echo '</table>';
+}
+
+// Action hook to save the meta box data when the post is saved
+add_action('save_post', 'halloween_store_save_meta_box');
+
+//save meta box data
+function halloween_store_save_meta_box($post_id)
+{
+  //verify the post type is for Halloween Products and metadata has been posted
+  if (get_post_type($post_id) == 'halloween-products' && isset($_POST['halloween_product_sku']))
   {
-    //register the array of settings
-    register_setting('halloween-settings-group', 'halloween_options', 'halloween_sanitize_options');
+    //if autosave skip saving data
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+      return;
+
+    //check nonce for security
+    check_admin_referer('meta-box-save', 'halloween-plugin');
+
+    // save the meta box data as post metadata
+    update_post_meta($post_id, '_halloween_product_sku', sanitize_text_field($_POST['halloween_product_sku']));
+    update_post_meta($post_id, '_halloween_product_price', sanitize_text_field($_POST['halloween_product_price']));
+    update_post_meta($post_id, '_halloween_product_weight', sanitize_text_field($_POST['halloween_product_weight']));
+    update_post_meta($post_id, '_halloween_product_color', sanitize_text_field($_POST['halloween_product_color']));
+    update_post_meta($post_id, '_halloween_product_inventory', sanitize_text_field($_POST['halloween_product_inventory']));
+  }
+}
+
+// Action hook to create the products shortcode
+add_shortcode('hs', 'halloween_store_shortcode');
+
+ //create shortcode
+function halloween_store_shortcode($atts, $content = null)
+{
+  global $post;
+
+  extract(shortcode_atts(array(
+      "show" => ''
+      ), $atts));
+
+  //load options array
+  $hween_options_arr = get_option('halloween_options');
+
+  if ($show == 'sku')
+  {
+    $hs_show = get_post_meta($post->ID, '_halloween_product_sku', true);
+  }
+  elseif ($show == 'price')
+  {
+    $hs_show = $hween_options_arr['currency_sign'] .
+      get_post_meta($post->ID, '_halloween_product_price', true);
+  }
+  elseif ($show == 'weight')
+  {
+    $hs_show = get_post_meta($post->ID, '_halloween_product_weight', true);
+  }
+  elseif ($show == 'color')
+  {
+    $hs_show = get_post_meta($post->ID, '_halloween_product_color', true);
+  }
+  elseif ($show == 'inventory')
+  {
+    $hs_show = get_post_meta($post->ID, '_halloween_product_inventory', true);
+  }
+  //return the shortcode value to display
+  return $hs_show;
+}
+
+// Action hook to create plugin widget
+add_action('widgets_init', 'halloween_store_register_widgets');
+
+//register the widget
+function halloween_store_register_widgets()
+{
+  register_widget('hs_widget');
+}
+
+//hs_widget class
+class hs_widget extends WP_Widget
+{
+
+  //process our new widget
+  function __construct()
+  {
+    $widget_ops = array(
+        'classname'   => 'hs-widget-class',
+        'description' => __('Display Halloween Products', 'halloween-plugin'));
+    parent::__construct('hs_widget', __('Products Widget', 'halloween-plugin'), $widget_ops);
   }
 
-  function halloween_sanitize_options($options)
+  //build our widget settings form
+  function form($instance)
   {
-    $options['show_inventory'] = (!empty($options['show_inventory']) ) ?
-      sanitize_text_field($options['show_inventory']) : '';
-    $options['currency_sign'] = (!empty($options['currency_sign']) ) ?
-      sanitize_text_field($options['currency_sign']) : '';
-    return $options;
+    $defaults = array(
+        'title'           => __('Products', 'halloween-plugin'),
+        'number_products' => '3');
+
+    $instance = wp_parse_args((array) $instance, $defaults);
+    $title = $instance['title'];
+    $number_products = $instance['number_products'];
+    ?>
+
+    <p><?php _e('Title', 'halloween-plugin') ?>:
+      <input class="widefat"
+             name="<?php echo $this->get_field_name('title'); ?>"
+             type="text" value="<?php echo esc_attr($title); ?>" /></p>
+    <p><?php _e('Number of Products', 'halloween-plugin') ?>:
+      <input name="<?php echo $this->get_field_name('number_products'); ?>"
+             type="text" value="<?php echo esc_attr($number_products); ?>"
+             size="2" maxlength="2" />
+    </p>
+    <?php
+  }
+
+  //save our widget settings
+  function update($new_instance, $old_instance)
+  {
+    $instance = $old_instance;
+    $instance['title'] = sanitize_text_field($new_instance['title']);
+    $instance['number_products'] = absint($new_instance['number_products']);
+
+    return $instance;
+  }
+
+  //display our widget
+  function widget($args, $instance)
+  {
+    global $post;
+    
+    extract($args);
+    
+    echo $before_widget;
+    
+    $title = apply_filters('widget_title', $instance['title']);
+    $number_products = $instance['number_products'];
+    
+    if (!empty($title))
+    {
+      echo $before_title . esc_html($title)
+      . $after_title;
+    };
+    
+    //custom query to retrieve products
+    $args = array(
+        'post_type'      => 'halloween-products',
+        'posts_per_page' => absint($number_products)
+    );
+    
+    $dispProducts = new WP_Query();
+    $dispProducts->query($args);
+        
+    while ($dispProducts->have_posts()) : $dispProducts->the_post();
+      
+      //load options array
+      $hween_options_arr = get_option('halloween_options');
+      
+      //load custom meta values
+      $hs_price = get_post_meta($post->ID, '_halloween_product_price', true);
+      $hs_inventory = get_post_meta($post->ID, '_halloween_product_inventory', true);
+      ?>
+      <p>
+        <a href="<?php the_permalink(); ?>"
+           rel="bookmark"
+           title="<?php the_title_attribute(); ?> Product Information">
+      <?php the_title(); ?>
+        </a>
+      </p>
+      <?php
+      echo '<p>' . __('Price', 'halloween-plugin') . ': '
+      . $hween_options_arr['currency_sign'] . $hs_price . '</p>';
+      
+      //check if Show Inventory option is enabled
+      if ($hween_options_arr['show_inventory'])
+      {
+        //display the inventory metadata for this product
+        echo '<p>' . __('Stock', 'halloween-plugin') . ': '
+        . $hs_inventory . '</p>';
+      }
+      echo '<hr>';
+    endwhile;
+    
+    wp_reset_postdata();
+    echo $after_widget;
   }
 
 }

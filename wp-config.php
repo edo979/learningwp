@@ -13,6 +13,8 @@
  *
  * @package WordPress
  */
+
+define('WP_DEBUG', true);
 define('WP_SITEURL', 'http://' . $_SERVER['SERVER_NAME'] . '/wordpress');
 define('WP_HOME',    'http://' . $_SERVER['SERVER_NAME']);
 define('WP_CONTENT_DIR', $_SERVER['DOCUMENT_ROOT'] . '/wp-content');

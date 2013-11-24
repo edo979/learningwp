@@ -17,7 +17,7 @@
  * instead attached to a filter or action hook.
  */
 // Some constants
-define(TEMPLATEDIR, get_template_directory_uri());
+define('TEMPLATEDIR', get_template_directory_uri());
 
 // Register custom navigation walker for bootstrap meny
 require_once('wp_bootstrap_navwalker.php');
@@ -312,65 +312,3 @@ function custom_excerpt_length($length)
 }
 
 add_filter('excerpt_length', 'custom_excerpt_length', 999);
-
-
-
-/**
- * Excersise custom post
- */
-add_action('init', 'esse_register_my_popst_type');
-
-function esse_register_my_popst_type()
-{
-  $labels = array(
-      'name'               => 'Products',
-      'singular_name'      => 'Product',
-      'add_new'            => 'Add New Product',
-      'add_new_item'       => 'Add New Product',
-      'edit_item'          => 'Edit Product',
-      'new_item'           => 'New Product',
-      'all_items'          => 'All Products',
-      'view_item'          => 'View Product',
-      'search_items'       => 'Search Products',
-      'not_found'          => 'No products found',
-      'not_found_in_trash' => 'No products found in Trash',
-      'parent_item_colon'  => '',
-      'menu_name'          => 'Products',
-  );
-  $args = array(
-      'labels' => $labels,
-      'public' => true,
-      'supports' => array( 'title', 'editor', 'author', 'thumbnail', 'comments','custom-fields' )
-  );
-  register_post_type('products', $args);
-}
-
-/**
- * Excersise taxonomy
- */
-add_action('init', 'esse_define_product_type_taxonomy');
-
-function esse_define_product_type_taxonomy()
-{
-  $labels = array(
-      'name'              => 'Type',
-      'singular_name'     => 'Types',
-      'search_items'      => 'Search Types',
-      'all_items'         => 'All Types',
-      'parent_item'       => 'Parent Type',
-      'parent_item_colon' => 'Parent Type:',
-      'edit_item'         => 'Edit Type',
-      'update_item'       => 'Update Type',
-      'add_new_item'      => 'Add New Type',
-      'new_item_name'     => 'New Type Name',
-      'menu_name'         => 'Type'
-  );
-  $args = array(
-      'labels'       => $labels,
-      'hierarchical' => true,
-      'query_var'    => true,
-      'rewrite'      => true
-  );
-  register_taxonomy('type', 'products', $args);
-}
-?>

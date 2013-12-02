@@ -58,17 +58,29 @@
 
       <!-- Carousel
       ================================================== -->
-      <?php
+      <div id="mytheme-carousel" class="carousel slide" data-ride="carousel">
+        <?php
         // Get slides from transient
-        if (FALSE == ($slides = get_transient('slides_order_result'))) {
-          echo 'sory no slides found';
-          die();
+        if ($slides = get_transient('slides_order_result'))
+        {
+          // Show slides from transient cache
+          echo $slides;
         }
-        
-        // Show slides from transient cache
-        echo $slides;
-      ?>
+        else
+        {
+          // Set default order
+          easytheme_slides_save_order();
+          if ($slides = get_transient('slides_order_result'))
+          {
+            echo $slides;
+          }
+          else
+          {
+            echo 'sory no slides found';
+          }
+        }
+        ?>
 
-      <a class="left carousel-control" href="#mytheme-carousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
-      <a class="right carousel-control" href="#mytheme-carousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
-    </div><!-- /.carousel -->
+        <a class="left carousel-control" href="#mytheme-carousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
+        <a class="right carousel-control" href="#mytheme-carousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
+      </div><!-- /.carousel -->

@@ -58,35 +58,16 @@
 
       <!-- Carousel
       ================================================== -->
-      <div id="mytheme-carousel" class="carousel slide" data-ride="carousel">
-        <!-- Indicators -->
-        <ol class="carousel-indicators">
-          <li data-target="#mytheme-carousel" data-slide-to="0" class="active"></li>
-          <li data-target="#mytheme-carousel" data-slide-to="1"></li>
-          <li data-target="#mytheme-carousel" data-slide-to="2"></li>
-        </ol>
-        <div class="carousel-inner">
-          <?php
-          $args = array('post_type' => 'slide', 'posts_per_page' => 3);
-          $loop = new WP_Query($args);
-          $i = 0;
-          while ($loop->have_posts()) : $loop->the_post();
-            ?>
-
-          <div class="item <?php if (!$i) : ?>active <?php $i=1; endif;?>">
-              <?php the_post_thumbnail('full', array('alt' => 'slider image')); ?>
-              <div class="container">
-                <div class="carousel-caption">
-                  <h1><?php the_title(); ?></h1>
-                  <p><?php the_content(); ?></p>
-                  <p><a class="btn btn-lg btn-primary" href="#" role="button">Sign up today</a></p>
-                </div><!-- .carousel-caption -->
-              </div><!-- .container -->
-            </div><!-- .item -->
-            
-          <?php endwhile; ?>
-            
-       </div><!-- .carousel-inner -->
+      <?php
+        // Get slides from transient
+        if (FALSE == ($slides = get_transient('slides_order_result'))) {
+          echo 'sory no slides found';
+          die();
+        }
+        
+        // Show slides from transient cache
+        echo $slides;
+      ?>
 
       <a class="left carousel-control" href="#mytheme-carousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
       <a class="right carousel-control" href="#mytheme-carousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>

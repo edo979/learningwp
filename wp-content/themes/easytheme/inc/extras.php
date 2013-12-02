@@ -131,9 +131,6 @@ function easytheme_create_menu()
     , 'slide-settings-page'
     , 'easytheme_settings_page');
 
-  //save settings in DB
-  add_action('admin_init', 'easytheme_register_settings');
-
   //add jquery ui script for sortable options
   add_action('admin_print_scripts-' . $page_hook_suffix, 'easytheme_custom_admin_script');
 }
@@ -151,6 +148,8 @@ function easytheme_register_settings()
     , 'easytheme_sanitize_callback');
 }
 
+  add_action('admin_init', 'easytheme_register_settings');
+
 /**
  * Add javaScripts to page
  */
@@ -167,7 +166,6 @@ function easytheme_settings_page()
 {
   ?>
   <div class="wrap">
-    <?php screen_icon(); ?>
     <h2>Slide Options</h2>
 
     <table id="admin-slides-sort" class="widefat">
@@ -186,9 +184,33 @@ function easytheme_settings_page()
       <tbody>
         <?php
         global $post;
-        $args = array('post_type' => 'slide');
+        
+        if ($slidesOrder = get_option('easytheme_slide_order'))
+        {
+          // Slides order set
+          $args = array('post_type' => 'slide', 'post_in' => $slidesOrder);
+        }
+        else
+        {
+          // Slides order not set, use default date created order of slides
+          $args = array('post_type' => 'slide');
+        }
+        
+        // get slides in array by id
         $loop = new WP_Query($args);
-        while ($loop->have_posts()) : $loop->the_post();
+        while ($loop->have_posts()) :
+          $loop->the_post();
+          $slides_id[(string) get_the_ID()] = $post;
+        endwhile;
+
+        // Reorder slides to match order on settings page
+        ($slidesOrder) ? $slidesOrder : $slidesOrder = $slides_id; // fallback
+        
+        // Build slides on settings page in admin area
+        foreach ($slidesOrder as $id) :
+          
+          if (! $post = $slides_id[(string) $id])
+            continue;
           ?>
           <tr <?php echo "id='item_" . get_the_ID() . "'"; ?> class="list-items">
             <td><?php the_post_thumbnail('medium', array('alt' => 'slider image')); ?></td>
@@ -198,20 +220,28 @@ function easytheme_settings_page()
               <p><?php the_ID(); ?></p>
             </td>
           </tr>
-        <?php endwhile; ?>
+          
+        <?php endforeach; ?>
+          
       </tbody>
     </table>
+    </div><!-- .wrap -->
 
     <?php
   }
 
   /**
    * Process ajax request
+   * Build Bootstrap carousel, preserve order from settings page in admin area.
    */
   function easytheme_slides_save_order()
   {
-    $slides = $_POST['item'];
+    $slidesOrder = $_POST['item'];
+    
+    // Save slides order in options DB
+    update_option( 'easytheme_slide_order', $slidesOrder );
 
+    // cache output to transient db
     ob_start();
     ?>
     <div id="mytheme-carousel" class="carousel slide" data-ride="carousel">
@@ -224,18 +254,20 @@ function easytheme_settings_page()
       <div class="carousel-inner">
         <?php
         global $post;
-        $args = array('post_type' => 'slide', 'post_in' => $slides);
-        $loop = new WP_Query($args);
         $firstSlideActive = true; // set active class to first slide
-        // get active slides
+        
+        $args = array('post_type' => 'slide', 'post_in' => $slidesOrder);
+        $loop = new WP_Query($args);
+        
+        // get slides and save in array using slide id
         while ($loop->have_posts()) :
           $loop->the_post();
           $slides_id[(string) get_the_ID()] = $post;
         endwhile;
 
         // Reorder slides to match order on settings page
-        foreach ($slides as $id) :
-          if (!$post = $slides_id[(string) $id])
+        foreach ($slidesOrder as $id) :
+          if (! $post = $slides_id[(string) $id])
             continue;
           ?>
           <div class="item<?php if ($firstSlideActive) : ?> active<?php endif; ?>">
@@ -248,13 +280,15 @@ function easytheme_settings_page()
               </div><!-- .carousel-caption -->
             </div><!-- .container -->
           </div><!-- .item -->
-          <?php $firstSlideActive = false;
+          <?php $firstSlideActive = false; // disable slide active class
         endforeach;
         ?>
       </div><!-- .carousel-inner -->
       <?php
       $result = ob_get_clean();
-      print_r($result);
+      
+      // store result in DB for 1 week
+      set_transient('slides_order_result', $result, 60*60*24*7);
     }
 
     add_action('wp_ajax_easytheme_slides_update', 'easytheme_slides_save_order');
@@ -271,4 +305,3 @@ function easytheme_settings_page()
 
       return $input;
     }
-    

@@ -185,24 +185,17 @@ function easytheme_settings_page()
         <?php
         global $post;
 
-        if ($slidesOrder = get_option('easytheme_slide_order'))
-        {
-          // Slides order set
-          $args = array('post_type' => 'slide', 'post_in' => $slidesOrder);
-        }
-        else
-        {
-          // Slides order not set, use default date created order of slides
-          $args = array('post_type' => 'slide');
-        }
+        $slidesOrder = get_option('easytheme_slide_order');
+        $args = array('post_type' => 'slide');
 
-        // get slides in array by id
+        // get slides
         $loop = new WP_Query($args);
         while ($loop->have_posts()) :
           $loop->the_post();
           $slides_id[(string) get_the_ID()] = $post;
         endwhile;
 
+//print_r($slidesOrder);die();
         // Reorder slides to match order on settings page
         ($slidesOrder) ? $slidesOrder : $slidesOrder = array_keys($slides_id); // fallback
         // Build slides on settings page in admin area
@@ -239,15 +232,19 @@ function easytheme_slides_save_order()
   {
     // Slides order is set in post array
     $slidesOrder = $_POST['item'];
-    $args = array('post_type' => 'slide', 'post_in' => $slidesOrder);
+    $args = array('post_type' => 'slide');
 
     // Save slides order in options DB
     update_option('easytheme_slide_order', $slidesOrder);
+    print_r($slidesOrder);die();
   }
   else
   {
     // Use wp default order, POST not set
     $args = array('post_type' => 'slide');
+
+    // If slides order is set use it, or false
+    $slidesOrder = get_option('easytheme_slide_order');
   }
 
   global $post;
@@ -262,7 +259,7 @@ function easytheme_slides_save_order()
   endwhile;
 
   // Reorder slides to match order on settings page
-  isset($slidesOrder) ? $slidesOrder : $slidesOrder = array_keys($slides_id); // fallback
+  $slidesOrder ? $slidesOrder : $slidesOrder = array_keys($slides_id); // fallback
   // cache output to transient db
   ob_start();
   ?>
@@ -303,6 +300,56 @@ function easytheme_slides_save_order()
 }
 
 add_action('wp_ajax_easytheme_slides_update', 'easytheme_slides_save_order');
+
+/**
+ * Refresh slideOrder on create new slide or update slide
+ * 
+ * @param int $post_id new or updated slide
+ * @return void
+ */
+function easytheme_refresh_slide_order($post_id)
+{
+  $post = get_post($post_id);
+
+  if ('slide' == $post->post_type)
+  {
+    $slidesOrder = get_option('easytheme_slide_order');
+    
+    if ($slidesOrder)
+    {
+      // Recreate slides order on delete
+      if ($post->post_status == 'trash')
+      {
+        // Find slides in slides order and remove it
+        $slidesOrder = array_diff($slidesOrder, array($post_id));
+      }
+      else
+      {
+        // Recreate slides order on add new
+        // check is post_id in slideOrder to determine if new or update slide
+        if (in_array($post_id, $slidesOrder, true))
+        {
+          // This is update. Recreate slide
+          easytheme_slides_save_order();
+          return;
+        }
+
+        // Add new slide
+        print_r($slidesOrder);
+        array_push($slidesOrder, $post_id);
+        
+      }
+
+      // Slides order changes, update slide order
+      update_option('easytheme_slide_order', $slidesOrder);
+
+      // Recreate slide
+      easytheme_slides_save_order();
+    }
+  }
+}
+
+add_action('post_updated', 'easytheme_refresh_slide_order');
 
 /**
  * Sanitize form input data before storing in db

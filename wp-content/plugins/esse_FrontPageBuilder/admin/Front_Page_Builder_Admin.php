@@ -65,10 +65,6 @@ class Front_Page_Builder_Admin
     add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
     add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
 
-    // Add the options page and menu item.
-    add_action('admin_menu', array($this, 'create_front_page_menu'));
-    add_action('admin_menu', array($this, 'create_slide_menu'));
-
     // Add an action link pointing to the options page.
     $plugin_basename = plugin_basename(plugin_dir_path(__DIR__) . $this->plugin_slug . '.php');
     add_filter('plugin_action_links_' . $plugin_basename, array($this, 'add_action_links'));
@@ -80,7 +76,16 @@ class Front_Page_Builder_Admin
      * http://codex.wordpress.org/Plugin_API#Hooks.2C_Actions_and_Filters
      */
     // Create custom post type
-    add_action('init', array($this, 'create_slide_post_type'));
+    add_action('init', array($this, 'fp_item_post_type'));
+
+    // Set custom post type to slide, quote ...
+    add_action('add_meta_boxes', array($this, 'fp_item_meta_box'));
+
+    // hook to save our meta box data when the post is saved
+    add_action('save_post', array($this, 'fp_item_type_save'));
+
+    // Add submenu for slides setting
+    add_action('admin_menu', array($this, 'create_slide_menu'));
 
     add_filter('@TODO', array($this, 'filter_method_name'));
   }
@@ -170,8 +175,6 @@ class Front_Page_Builder_Admin
      *
      *        Administration Menus: http://codex.wordpress.org/Administration_Menus
      *
-     * @TODO:
-     *
      * - Change 'Page Title' to the title of your plugin admin page
      * - Change 'Menu Text' to the text for menu item for the plugin settings page
      * - Change 'manage_options' to the capability you see fit
@@ -208,25 +211,26 @@ class Front_Page_Builder_Admin
   }
 
   /**
-   * Create Slide
+   * Create FP Item custom post type
+   * 
    * @since    1.0.0
    */
-  public function create_slide_post_type()
+  public function fp_item_post_type()
   {
     $labels = array(
-        'name'               => __('Slides', $this->plugin_slug),
-        'singular_name'      => __('Slides', $this->plugin_slug),
-        'add_new'            => __('Add New', $this->plugin_slug),
-        'add_new_item'       => __('Add New Slide', $this->plugin_slug),
-        'edit_item'          => __('Edit Slide', $this->plugin_slug),
-        'new_item'           => __('New Slide', $this->plugin_slug),
-        'all_items'          => __('All Slide', $this->plugin_slug),
-        'view_item'          => __('View Slide', $this->plugin_slug),
-        'search_items'       => __('Search Slide', $this->plugin_slug),
-        'not_found'          => __('No slides found', $this->plugin_slug),
-        'not_found_in_trash' => __('No slides found in Trash', $this->plugin_slug),
+        'name'               => __('FP Items', $this->plugin_slug),
+        'singular_name'      => __('FP Item', $this->plugin_slug),
+        'add_new'            => __('Add New FP Item', $this->plugin_slug),
+        'add_new_item'       => __('Add New FP Item', $this->plugin_slug),
+        'edit_item'          => __('Edit FP Item', $this->plugin_slug),
+        'new_item'           => __('New FP Item', $this->plugin_slug),
+        'all_items'          => __('All FP Items', $this->plugin_slug),
+        'view_item'          => __('View FP Item', $this->plugin_slug),
+        'search_items'       => __('Search FP Item', $this->plugin_slug),
+        'not_found'          => __('No FP Item found', $this->plugin_slug),
+        'not_found_in_trash' => __('No FP Item found in Trash', $this->plugin_slug),
         'parent_item_colon'  => '',
-        'menu_name'          => __('Front Builder', $this->plugin_slug)
+        'menu_name'          => __('FP Builder', $this->plugin_slug)
     );
 
     $args = array(
@@ -239,66 +243,97 @@ class Front_Page_Builder_Admin
         'rewrite'            => true,
         'has_archive'        => true,
         'hierarchical'       => false,
-        'menu_position'      => 27,
+        'menu_position'      => 2,
         'supports'           => array('title', 'editor', 'thumbnail')
     );
 
-    register_post_type('slide', $args);
+    register_post_type('fp_item', $args);
   }
 
   /**
-   * Build main manu for building front page
-   * 
-   * @since   1.0.0
-   */
-  function create_front_page_menu()
-  {
-    $this->plugin_screen_hook_suffix = add_menu_page(
-      __('Front Page Builder', $this->plugin_slug)
-      , __('Front Page', $this->plugin_slug)
-      , 'edit_posts'
-      , 'fp-builder-main-menu'
-      , array($this, 'display_front_page_menu')
-      , ''
-      , 26);
-  }
-
-  /**
-   * Display Front Page Menu
-   * 
-   * @since   1.0.0
-   */
-  function display_front_page_menu()
-  {
-    include_once( 'views/main_menu.php' );
-  }
-  
-  /**
-   * Create submenu for slides
+   * Create submenu for slides settings.
+   * Menu apper in custom post type (FB Builder menu)
    * 
    * @since   1.0.0
    */
   function create_slide_menu()
   {
-     $this->plugin_screen_hook_suffix = add_submenu_page(
-      'fp-builder-main-menu'
-      , __('Slides', $this->plugin_slug)
-      , __('Slides', $this->plugin_slug)
+    $this->plugin_screen_hook_suffix = add_submenu_page(
+      'edit.php?post_type=fp_item'
+      , __('Slides Settings', $this->plugin_slug)
+      , __('Slides Settings', $this->plugin_slug)
       , 'edit_posts'
-      , 'fp-builer-slides'
-      , array($this, 'display_slide_submenu')
-      , ''
-      , 26);
+      , 'fp-slides-settings'
+      , array($this, 'display_slide_submenu'));
   }
-  
+
   /**
-   * Display submenu for slides
+   * Display submenu for slides settings.
    * 
    * @since   1.0.0
    */
   function display_slide_submenu()
   {
     include_once( 'views/slides_submenu.php' );
+  }
+
+  /**
+   * Create meta box for chosing type of fp_item.
+   * 
+   * On front page We have: Slide, Quote.
+   * Using meta data set type of new fp_item.
+   * 
+   * @since   1.0.0
+   */
+  function fp_item_meta_box()
+  {
+    add_meta_box(
+      'esse-meta'
+      , 'Chose type'
+      , array($this, 'display_type_meta_box')
+      , 'fp_item'
+      , 'side'
+      , 'default');
+  }
+
+  /**
+   * Display meta box for chosing type of fp_item.
+   * 
+   * @param   object $post curent post
+   * @box     object $box
+   * 
+   * @since   1.0.0
+   */
+  function display_type_meta_box($post, $box)
+  {
+    $fp_item_type = get_post_meta($post->ID, '_esse_FP_item_type', true);
+
+    wp_nonce_field(plugin_basename(__FILE__), 'esse_save_type_meta_box');
+
+    include_once( 'views/type_meta_box.php' );
+  }
+
+  /**
+   * Save fp_item_type in meta data from meta box
+   * 
+   * @param int $post_id post id
+   * 
+   * @since   1.0.0
+   */
+  function fp_item_type_save($post_id)
+  {
+    if (isset($_POST['fp_item_type']))
+    {
+      // if auto saving skip saving our meta box data
+      if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+        return;
+      
+      //check nonce for security
+      check_admin_referer(plugin_basename(__FILE__), 'esse_save_type_meta_box');
+      
+      // save the meta box data as post meta using the post ID as a unique prefix
+      update_post_meta($post_id, '_esse_FP_item_type', sanitize_text_field($_POST['fp_item_type']));
+    }
   }
 
   /**

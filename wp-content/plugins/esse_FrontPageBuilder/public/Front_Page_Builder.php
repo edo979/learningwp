@@ -3,7 +3,7 @@
  * Front Page Builder
  *
  * @package   esse_Front_Page_Builder
- * @author    Edis Selimovic <prezentabilan@gamil.com>
+ * @author    Edis Selimovic <prezentabilan@gmail.com>
  * @license   GPL-2.0+
  * @link      http://kvalitetnije.com.ba
  * @copyright 2013 Edis Selimovic
@@ -14,7 +14,7 @@
  * public-facing side of the WordPress site.
  *
  * @package esse_Front_Page_Builder
- * @author  Edis Selimovic <prezentabilan@gamil.com>
+ * @author  Edis Selimovic <prezentabilan@gmail.com>
  */
 class Front_Page_Builder {
 

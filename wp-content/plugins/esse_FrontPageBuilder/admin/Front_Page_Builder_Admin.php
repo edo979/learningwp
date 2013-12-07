@@ -274,6 +274,29 @@ class Front_Page_Builder_Admin
    */
   function display_slide_submenu()
   {
+    // loop arguments, loop is in view
+    $args = array(
+        'post_type' => 'fp_item',
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'fp_item_type',
+                'field'    => 'slug',
+                'terms'    => 'slide'
+            )
+        )
+    );
+
+    // get slides order
+    $slidesOrder = get_option('fp_builder_slide_order');
+
+    if ($slidesOrder)
+    {
+      // if slides order set, show slides in order
+      $args['post__in'] = $slidesOrder;
+      $args['order_by'] = 'post__in';
+    }
+    
+    // if slides order not set, show slide in default order
     include_once( 'views/slides_submenu.php' );
   }
 
@@ -353,9 +376,9 @@ class Front_Page_Builder_Admin
     {
       if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
         return;
-      
+
       check_admin_referer(plugin_basename(__FILE__), 'esse_save_meta_box');
-      
+
       wp_set_object_terms($post_id, $_POST['fp_item_type'], 'fp_item_type');
     }
   }

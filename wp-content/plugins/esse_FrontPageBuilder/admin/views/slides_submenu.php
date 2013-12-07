@@ -29,21 +29,23 @@
       </tr>
     </tfoot>
     <tbody>
-      <?php 
-        $slides = new WP_Query($args);
-        while ($slides->have_posts()) : $slides->the_post();
+      <?php
+      query_posts($args);
+      if (have_posts()) :
+        while (have_posts()) : the_post();
+          ?>
+          <tr <?php echo "id='item_'" . get_the_ID() . "'"; ?> class="list_items">
+            <td><?php the_post_thumbnail('medium', array('alt' => 'slider image')); ?></td>
+            <td>
+              <h3><?php the_title(); ?></h3>
+              <p><?php the_content(); ?></p>
+              <p><?php the_ID(); ?></p>
+            </td>
+          </tr>
+          <?php
+        endwhile;
+      endif;
       ?>
-      
-        <tr <?php echo "id='item_'" . get_the_ID() . "'"; ?> class="list_items">
-          <td><?php the_post_thumbnail('medium', array('alt' => 'slider image')); ?></td>
-          <td>
-            <h3><?php the_title(); ?></h3>
-            <p><?php the_content(); ?></p>
-            <p><?php the_ID(); ?></p>
-          </td>
-        </tr>
-        
-      <?php endwhile; ?>
     </tbody>
   </table>
 </div> <!-- .wrap -->

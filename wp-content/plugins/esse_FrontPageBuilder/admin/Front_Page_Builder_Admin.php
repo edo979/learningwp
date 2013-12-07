@@ -288,12 +288,13 @@ class Front_Page_Builder_Admin
 
     // get slides order
     $slidesOrder = get_option('fp_builder_slide_order');
+    //$slidesOrder = array(1756, 1745, 1757);
 
     if ($slidesOrder)
     {
       // if slides order set, show slides in order
       $args['post__in'] = $slidesOrder;
-      $args['order_by'] = 'post__in';
+      $args['orderby'] = 'post__in'; // @since 3.5
     }
     
     // if slides order not set, show slide in default order

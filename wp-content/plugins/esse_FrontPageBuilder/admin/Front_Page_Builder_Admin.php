@@ -78,11 +78,10 @@ class Front_Page_Builder_Admin
     // Create custom post type
     add_action('init', array($this, 'fp_item_post_type'));
 
-    // Set custom post type to slide, quote ...
-    add_action('add_meta_boxes', array($this, 'fp_item_meta_box'));
-
-    // hook to save our meta box data when the post is saved
-    add_action('save_post', array($this, 'fp_item_type_save'));
+    // Define custom post type taxonomy using meta box
+    add_action('init', array($this, 'define_fp_item_type'));
+    add_action('add_meta_boxes', array($this, 'select_fp_item_type'));
+    add_action('save_post', array($this, 'save_fp_item_type'));
 
     // Add submenu for slides setting
     add_action('admin_menu', array($this, 'create_slide_menu'));
@@ -244,7 +243,8 @@ class Front_Page_Builder_Admin
         'has_archive'        => true,
         'hierarchical'       => false,
         'menu_position'      => 2,
-        'supports'           => array('title', 'editor', 'thumbnail')
+        'supports'           => array('title', 'editor', 'thumbnail'),
+        'taxonomies'         => array('fp_item_type')
     );
 
     register_post_type('fp_item', $args);
@@ -278,61 +278,85 @@ class Front_Page_Builder_Admin
   }
 
   /**
-   * Create meta box for chosing type of fp_item.
-   * 
-   * On front page We have: Slide, Quote.
-   * Using meta data set type of new fp_item.
+   * Define taxonomy for fp_item. Is fp item: slide or quote.
    * 
    * @since   1.0.0
    */
-  function fp_item_meta_box()
+  function define_fp_item_type()
+  {
+    $labels = array(
+        'name'              => __('Type', $this->plugin_slug),
+        'singular_name'     => __('Types', $this->plugin_slug),
+        'search_items'      => __('Search Types', $this->plugin_slug),
+        'all_items'         => __('All Types', $this->plugin_slug),
+        'parent_item'       => __('Parent Type', $this->plugin_slug),
+        'parent_item_colon' => __('Parent Type:', $this->plugin_slug),
+        'edit_item'         => __('Edit Type', $this->plugin_slug),
+        'update_item'       => __('Update Type', $this->plugin_slug),
+        'add_new_item'      => __('Add New Type', $this->plugin_slug),
+        'new_item_name'     => __('New Type Name', $this->plugin_slug),
+        'menu_name'         => __('Type', $this->plugin_slug)
+    );
+
+    $args = array(
+        'labels'       => $labels,
+        'public'       => false,
+        'hierarchical' => false,
+        'query_var'    => true,
+        'rewrite'      => true
+    );
+
+    register_taxonomy('fp_item_type', 'fp_item', $args);
+  }
+
+  /**
+   * Create meta box for selectint type of fp item.
+   * 
+   * @since   1.0.0
+   */
+  function select_fp_item_type()
   {
     add_meta_box(
-      'esse-meta'
-      , 'Chose type'
-      , array($this, 'display_type_meta_box')
-      , 'fp_item'
-      , 'side'
-      , 'default');
+      'fp-item-type'
+      , __('Type', $this->plugin_slug)
+      , array($this, 'meta_box_fp_item_type')
+      , 'fp_item', 'side', 'default'
+    );
   }
 
   /**
-   * Display meta box for chosing type of fp_item.
+   * Display meta box for select type of fp_item
    * 
-   * @param   object $post curent post
-   * @box     object $box
+   * @param   object $post post it self
+   * @param   type $box
    * 
    * @since   1.0.0
    */
-  function display_type_meta_box($post, $box)
+  function meta_box_fp_item_type($post, $box)
   {
-    $fp_item_type = get_post_meta($post->ID, '_esse_FP_item_type', true);
+    //nonce for security
+    wp_nonce_field(plugin_basename(__FILE__), 'esse_save_meta_box');
 
-    wp_nonce_field(plugin_basename(__FILE__), 'esse_save_type_meta_box');
-
-    include_once( 'views/type_meta_box.php' );
+    include_once( 'views/fp_item_type.php' );
   }
 
   /**
-   * Save fp_item_type in meta data from meta box
+   * Save taxonomy term from fp item
    * 
-   * @param int $post_id post id
+   * @param int $post_id Post id
    * 
    * @since   1.0.0
    */
-  function fp_item_type_save($post_id)
+  function save_fp_item_type($post_id)
   {
     if (isset($_POST['fp_item_type']))
     {
-      // if auto saving skip saving our meta box data
       if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
         return;
       
-      //check nonce for security
-      check_admin_referer(plugin_basename(__FILE__), 'esse_save_type_meta_box');
+      check_admin_referer(plugin_basename(__FILE__), 'esse_save_meta_box');
       
-      // save the meta box data as post meta using the post ID as a unique prefix
-      update_post_meta($post_id, '_esse_FP_item_type', sanitize_text_field($_POST['fp_item_type']));
+      wp_set_object_terms($post_id, $_POST['fp_item_type'], 'fp_item_type');
     }
   }
 

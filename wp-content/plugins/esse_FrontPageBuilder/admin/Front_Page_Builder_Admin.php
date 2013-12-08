@@ -405,8 +405,10 @@ class Front_Page_Builder_Admin
    */
   function set_slide_order()
   {
-    if (isset($_POST['item']))
+    if (isset($_POST['item']) AND isset($_POST['security']))
     {
+      check_ajax_referer( 'admin-slides-order-nonce', 'security' );
+      
       // Update slide order
       update_option('fp_builder_slide_order', $_POST['item']);
     }
@@ -468,7 +470,7 @@ class Front_Page_Builder_Admin
     {
       $term_list = wp_get_post_terms($post->ID, 'fp_item_type', array("fields" => "names"));
 
-      // Proced if post type of slide and slidesOrder is set
+      // Proced if post type of slide
       if (in_array('Slide', $term_list))
       {
         return true;

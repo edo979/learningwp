@@ -48,4 +48,5 @@
       ?>
     </tbody>
   </table>
+  <div id="slides-order-key" style="visibility: hidden;"><?php echo wp_create_nonce('admin-slides-order-nonce'); ?></div>
 </div> <!-- .wrap -->

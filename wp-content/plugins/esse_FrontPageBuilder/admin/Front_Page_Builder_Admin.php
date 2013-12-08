@@ -78,13 +78,16 @@ class Front_Page_Builder_Admin
     // Create custom post type
     add_action('init', array($this, 'fp_item_post_type'));
 
-    // Define custom post type taxonomy using meta box
+    // Define: custom post type, taxonomy, meta box.
     add_action('init', array($this, 'define_fp_item_type'));
     add_action('add_meta_boxes', array($this, 'select_fp_item_type'));
     add_action('save_post', array($this, 'save_fp_item_type'));
 
-    // Add submenu for slides setting
+    // Action for slides settings
     add_action('admin_menu', array($this, 'create_slide_menu'));
+    add_action('wp_ajax_esse_fpb_slides_order', array($this, 'set_slide_order'));
+    add_action('trashed_post', array($this, 'delete_slide'));
+    add_action('untrashed_post', array($this, 'restore_slide_from_trash'));
 
     add_filter('@TODO', array($this, 'filter_method_name'));
   }
@@ -155,7 +158,7 @@ class Front_Page_Builder_Admin
     $screen = get_current_screen();
     if ($this->plugin_screen_hook_suffix == $screen->id)
     {
-      wp_enqueue_script($this->plugin_slug . '-admin-script', plugins_url('assets/js/admin.js', __FILE__), array('jquery'), Front_Page_Builder::VERSION);
+      wp_enqueue_script($this->plugin_slug . '-admin-script', plugins_url('assets/js/admin.js', __FILE__), array('jquery-ui-sortable'), Front_Page_Builder::VERSION);
     }
   }
 
@@ -246,7 +249,6 @@ class Front_Page_Builder_Admin
         'supports'           => array('title', 'editor', 'thumbnail'),
         'taxonomies'         => array('fp_item_type')
     );
-
     register_post_type('fp_item', $args);
   }
 
@@ -264,7 +266,7 @@ class Front_Page_Builder_Admin
       , __('Slides Settings', $this->plugin_slug)
       , 'edit_posts'
       , 'fp-slides-settings'
-      , array($this, 'display_slide_submenu'));
+      , array($this, 'display_slide_settings'));
   }
 
   /**
@@ -272,7 +274,7 @@ class Front_Page_Builder_Admin
    * 
    * @since   1.0.0
    */
-  function display_slide_submenu()
+  function display_slide_settings()
   {
     // loop arguments, loop is in view
     $args = array(
@@ -296,7 +298,7 @@ class Front_Page_Builder_Admin
       $args['post__in'] = $slidesOrder;
       $args['orderby'] = 'post__in'; // @since 3.5
     }
-    
+
     // if slides order not set, show slide in default order
     include_once( 'views/slides_submenu.php' );
   }
@@ -381,7 +383,99 @@ class Front_Page_Builder_Admin
       check_admin_referer(plugin_basename(__FILE__), 'esse_save_meta_box');
 
       wp_set_object_terms($post_id, $_POST['fp_item_type'], 'fp_item_type');
+
+      // Add slide to slides order array on the end, if slides order is set
+      $slide = __('Slide', $this->plugin_slug);
+
+      if ($slidesOrder = get_option('fp_builder_slide_order') AND $_POST['fp_item_type'] == $slide)
+      {
+        $slidesOrder[] = $post_id;
+
+        update_option('fp_builder_slide_order', $slidesOrder);
+      }
     }
+  }
+
+  /**
+   * Processing ajax request.
+   * Set slide order with drag and drop funcionality. Slide order save in
+   * options DB.
+   * 
+   * @since   1.0.0
+   */
+  function set_slide_order()
+  {
+    if (isset($_POST['item']))
+    {
+      // Update slide order
+      update_option('fp_builder_slide_order', $_POST['item']);
+    }
+  }
+
+  /**
+   * Delete slide. Slide move to trash if trash enabled in settings.
+   * 
+   * @param   int $post_id Post id
+   * 
+   * @sicne   1.0.0 
+   */
+  function delete_slide($post_id)
+  {
+    if ($this->check_is_slide($post_id))
+    {
+      $slidesOrder = get_option('fp_builder_slide_order');
+
+      // Well then, remove slide from slide order
+      $slidesOrder = array_diff($slidesOrder, array($post_id));
+
+      update_option('fp_builder_slide_order', $slidesOrder);
+    }
+  }
+
+  /**
+   * Restore post from trash and add to end of array slidesOrder.
+   * 
+   * @param   int $post_id Post id
+   * 
+   * @since   1.0.0
+   */
+  function restore_slide_from_trash($post_id)
+  {
+    if ($this->check_is_slide($post_id))
+    {
+      $slidesOrder = get_option('fp_builder_slide_order');
+
+      // Well then, add slide to end of array slidesOrder
+      $slidesOrder[] = $post_id;
+
+      update_option('fp_builder_slide_order', $slidesOrder);
+    }
+  }
+
+  /**
+   * Check is fp_item type of slide, fp_item is custom post type defined above.
+   * 
+   * @param   type $post_id
+   * @return  boolean
+   * 
+   * @since   1.0.0
+   */
+  private function check_is_slide($post_id)
+  {
+    $post = get_post($post_id);
+
+    if ($post->post_type == 'fp_item')
+    {
+      $term_list = wp_get_post_terms($post->ID, 'fp_item_type', array("fields" => "names"));
+
+      // Proced if post type of slide and slidesOrder is set
+      if (in_array('Slide', $term_list))
+      {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

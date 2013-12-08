@@ -18,14 +18,14 @@
   <table id="admin-slides-sort" class="widefat">
     <thead>
       <tr>
-        <th><?php _e('Slides', 'easytheme'); ?></th>
-        <th><?php _e('Message', 'easytheme'); ?></th>
+        <th><?php _e('Slides', $this->plugin_slug); ?></th>
+        <th><?php _e('Message', $this->plugin_slug); ?></th>
       </tr>
     </thead>
     <tfoot>
       <tr>
-        <th><?php _e('Slides', 'easytheme'); ?></th>
-        <th><?php _e('Message', 'easytheme'); ?></th>
+        <th><?php _e('Slides', $this->plugin_slug); ?></th>
+        <th><?php _e('Message', $this->plugin_slug); ?></th>
       </tr>
     </tfoot>
     <tbody>
@@ -34,7 +34,7 @@
       if (have_posts()) :
         while (have_posts()) : the_post();
           ?>
-          <tr <?php echo "id='item_'" . get_the_ID() . "'"; ?> class="list_items">
+          <tr <?php echo "id='item_" . get_the_ID() . "'"; ?> class="list-items">
             <td><?php the_post_thumbnail('medium', array('alt' => 'slider image')); ?></td>
             <td>
               <h3><?php the_title(); ?></h3>

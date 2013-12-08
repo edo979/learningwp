@@ -3,7 +3,7 @@ Contributors: johnbillion
 Tags: debug, debugging, development, developer, performance, profiler, profiling, queries
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 2.5.6
+Stable tag: 2.6.1
 License: GPLv2 or later
 
 View debugging and performance information on database queries, hooks, conditionals, HTTP requests, redirects and more.	
@@ -47,6 +47,11 @@ Filtering queries by component or calling function makes it easy to see which pl
  * Shows an easily visible warning in the admin toolbar
  * Plays nicely with Xdebug
 
+= Request =
+
+ * Shows **matched rewrite rules** and associated query strings
+ * Shows **query vars** for the current request, and highlights **custom query vars**
+
 = HTTP Requests =
 
  * Shows all HTTP requests performed on the current page (as long as they use WordPress' HTTP API)
@@ -81,7 +86,6 @@ Hands up who can remember the correct names for the filters and hooks for custom
 
 = Everything Else =
 
- * Shows the names and values for **query vars** on the current page, and highlights **custom query vars**
  * Shows any **transients that were set**, along with their timeout, component, and call stack
  * Shows all **WordPress conditionals** on the current page, highlighted nicely
  * Shows an overview at the top, including page generation time and memory limit as absolute values and as % of their respective limits
@@ -100,7 +104,13 @@ Alternatively, see the guide to [Manually Installing Plugins](http://codex.wordp
 
 == Screenshots ==
 
-1. An example of Query Monitor's output
+1. The admin toolbar menu showing an overview
+2. Aggregate database queries by component
+3. Slow database queries highlighted in a separate panel
+4. Database queries complete with filter controls
+5. Hooks and actions
+6. HTTP requests (showing an HTTP error)
+7. Aggregate database queries grouped by calling function
 
 == Frequently Asked Questions ==
 
@@ -109,6 +119,17 @@ Alternatively, see the guide to [Manually Installing Plugins](http://codex.wordp
 I know!
 
 == Changelog ==
+
+= 2.6.1 =
+* Remove a file that was accidentally committed to the wordpress.org repo
+
+= 2.6 =
+* Toggleable stack traces for queries
+* Show deprecated errors in the PHP Errors panel
+* Replace the Query Vars panel with a Request panel with more information
+* Display a warning when `db.php` isn't in place
+* Fix some PHP 5.2 compatibility
+* Considerable restructuring of the underlying code to increase abstraction
 
 = 2.5.6 =
 * Fix the "Invalid header" issue. Woo!

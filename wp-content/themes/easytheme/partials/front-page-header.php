@@ -59,27 +59,34 @@
       <!-- Carousel
       ================================================== -->
       <div id="mytheme-carousel" class="carousel slide" data-ride="carousel">
-        <?php
-        // Get slides from transient
-        if ($slides = get_transient('slides_order_result'))
-        {
-          // Show slides from transient cache
-          echo $slides;
-        }
-        else
-        {
-          // Set default order
-          easytheme_slides_save_order();
-          if ($slides = get_transient('slides_order_result'))
-          {
-            echo $slides;
-          }
-          else
-          {
-            echo 'sory no slides found';
-          }
-        }
-        ?>
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
+          <?php for ($i = 0; $i < count($slidesOrder); $i++) : ?>
+            <li data-target="#mytheme-carousel" data-slide-to="<?php echo $i; ?>" class="<?php if (!$i) echo 'active'; ?>"></li>
+          <?php endfor; ?>
+        </ol>
+
+        <div class="carousel-inner">
+          <?php
+          foreach ($slidesOrder as $id) :
+            if (!$post = $slides_id[(string) $id])
+              continue;
+            ?>
+            <div class="item<?php if ($firstSlideActive) : ?> active<?php endif; ?>">
+              <?php the_post_thumbnail('full', array('alt' => 'slider image')); ?>
+              <div class="container">
+                <div class="carousel-caption">
+                  <h1><?php the_title(); ?></h1>
+                  <?php the_content(); ?>
+                  <p><a class="btn btn-lg btn-primary" href="#" role="button">Sign up today</a></p>
+                </div><!-- .carousel-caption -->
+              </div><!-- .container -->
+            </div><!-- .item -->
+            <?php
+            $firstSlideActive = false; // disable slide active class
+          endforeach;
+          ?>
+        </div><!-- .carousel-inner -->
 
         <a class="left carousel-control" href="#mytheme-carousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
         <a class="right carousel-control" href="#mytheme-carousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>

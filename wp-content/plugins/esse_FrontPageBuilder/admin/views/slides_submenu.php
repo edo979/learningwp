@@ -30,9 +30,8 @@
     </tfoot>
     <tbody>
       <?php
-      query_posts($args);
-      if (have_posts()) :
-        while (have_posts()) : the_post();
+      if ($slides->have_posts()) :
+        while ($slides->have_posts()) : $slides->the_post();
           ?>
           <tr <?php echo "id='item_" . get_the_ID() . "'"; ?> class="list-items">
             <td><?php the_post_thumbnail('medium', array('alt' => 'slider image')); ?></td>

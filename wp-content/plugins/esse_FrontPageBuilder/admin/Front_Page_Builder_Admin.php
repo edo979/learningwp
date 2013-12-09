@@ -276,31 +276,13 @@ class Front_Page_Builder_Admin
    */
   function display_slide_settings()
   {
-    // loop arguments, loop is in view
-    $args = array(
-        'post_type' => 'fp_item',
-        'tax_query' => array(
-            array(
-                'taxonomy' => 'fp_item_type',
-                'field'    => 'slug',
-                'terms'    => 'slide'
-            )
-        )
-    );
-
-    // get slides order
-    $slidesOrder = get_option('fp_builder_slide_order');
-    //$slidesOrder = array(1756, 1745, 1757);
-
-    if ($slidesOrder)
-    {
-      // if slides order set, show slides in order
-      $args['post__in'] = $slidesOrder;
-      $args['orderby'] = 'post__in'; // @since 3.5
-    }
+    // Query custom post type with arguments array, loop is inside view.
+    $slides = $this->get_slides();
 
     // if slides order not set, show slide in default order
     include_once( 'views/slides_submenu.php' );
+
+    wp_reset_postdata();
   }
 
   /**
@@ -367,7 +349,8 @@ class Front_Page_Builder_Admin
   }
 
   /**
-   * Save taxonomy term from fp item
+   * Save new item or update item. If item is slide, then add item to end 
+   * of slidesOrder array.
    * 
    * @param int $post_id Post id
    * 
@@ -391,7 +374,7 @@ class Front_Page_Builder_Admin
       {
         $slidesOrder[] = $post_id;
 
-        update_option('fp_builder_slide_order', $slidesOrder);
+        $this->update_slides_order($slidesOrder);
       }
     }
   }
@@ -407,10 +390,10 @@ class Front_Page_Builder_Admin
   {
     if (isset($_POST['item']) AND isset($_POST['security']))
     {
-      check_ajax_referer( 'admin-slides-order-nonce', 'security' );
-      
+      check_ajax_referer('admin-slides-order-nonce', 'security');
+
       // Update slide order
-      update_option('fp_builder_slide_order', $_POST['item']);
+      $this->update_slides_order($_POST['item']);
     }
   }
 
@@ -430,7 +413,7 @@ class Front_Page_Builder_Admin
       // Well then, remove slide from slide order
       $slidesOrder = array_diff($slidesOrder, array($post_id));
 
-      update_option('fp_builder_slide_order', $slidesOrder);
+      $this->update_slides_order($slidesOrder);
     }
   }
 
@@ -450,7 +433,7 @@ class Front_Page_Builder_Admin
       // Well then, add slide to end of array slidesOrder
       $slidesOrder[] = $post_id;
 
-      update_option('fp_builder_slide_order', $slidesOrder);
+      $this->update_slides_order($slidesOrder);
     }
   }
 
@@ -478,6 +461,99 @@ class Front_Page_Builder_Admin
     }
 
     return false;
+  }
+
+  /**
+   * Update slides order array. Option slides order is use for correct
+   * show slides in right order. Also update transient, update option from 4 place:
+   * save/update, ordering slide, trash, untrash.
+   * 
+   * @param   array $slidesOrder Order slides using slides id
+   * 
+   * @sinc    1.0.0
+   */
+  private function update_slides_order($slidesOrder)
+  {
+    //delete_option('fp_builder_slide_order');
+    update_option('fp_builder_slide_order', $slidesOrder);
+    
+    // Reset transient
+    $this->set_transient_data();
+  }
+
+  /**
+   * Return slides from transient data if aveilable or new query with slides data
+   * 
+   * @return  misc \WP Query
+   * 
+   * @since   1.0.0
+   */
+  private function get_slides()
+  {
+    // Check for cached queries. If none, then execute WP_Query
+    if (!( $query = get_transient('esse_fp_builder_query_slides') ))
+    {
+      return $this->set_transient_data();
+    }
+    else
+    {
+      // Make new query and save it to transient data
+      //delete_transient('esse_fp_builder_query_slides');
+      return $query;
+    }
+  }
+
+  /**
+   * Query database with valid arguments, returning slides order if set or
+   * default order if slidesOrder not set.
+   * 
+   * @return  misc \WP_Query
+   * 
+   * @since   1.0.0
+   */
+  private function query_slides()
+  {
+    // loop arguments
+    $args = array(
+        'post_type' => 'fp_item',
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'fp_item_type',
+                'field'    => 'slug',
+                'terms'    => 'slide'
+            )
+        )
+    );
+
+    // get slides order
+    $slidesOrder = get_option('fp_builder_slide_order');
+
+    if ($slidesOrder)
+    {
+      // if slides order set, show slides in order
+      $args['post__in'] = $slidesOrder;
+      $args['orderby'] = 'post__in'; // @since 3.5
+    }
+
+    return new WP_Query($args);
+  }
+
+  /**
+   * Set or update transient data. First call query_slides to get data then
+   * save data in transient for cache and bether performance.
+   * 
+   * @return misc \WP Query
+   * 
+   * @since   1.0.0
+   */
+  private function set_transient_data()
+  {
+    $query = $this->query_slides();
+
+    // Set transient data for 1 month
+    set_transient('esse_fp_builder_query_slides', $query, 60 * 60 * 24 * 7 * 4);
+
+    return $query;
   }
 
   /**

@@ -59,32 +59,45 @@
       <!-- Carousel
       ================================================== -->
       <div id="mytheme-carousel" class="carousel slide" data-ride="carousel">
+
+        <?php
+        $esse_front_page_builder = Front_Page_Builder::get_instance();
+
+        // Use only to set first slide class to active
+        $firstSlideActive = true;
+
+        // Get slides query from transient catche or quering db
+        // Now We have query object in variable, start building loop!
+        $esse_slides_query = $esse_front_page_builder->slides_get();
+        ?>
+
         <!-- Indicators -->
         <ol class="carousel-indicators">
-          <?php for ($i = 0; $i < count($slidesOrder); $i++) : ?>
+          <?php for ($i = 0; $i < $esse_slides_query->post_count; $i++) : ?>
             <li data-target="#mytheme-carousel" data-slide-to="<?php echo $i; ?>" class="<?php if (!$i) echo 'active'; ?>"></li>
           <?php endfor; ?>
         </ol>
 
         <div class="carousel-inner">
           <?php
-          foreach ($slidesOrder as $id) :
-            if (!$post = $slides_id[(string) $id])
-              continue;
-            ?>
-            <div class="item<?php if ($firstSlideActive) : ?> active<?php endif; ?>">
-              <?php the_post_thumbnail('full', array('alt' => 'slider image')); ?>
-              <div class="container">
-                <div class="carousel-caption">
-                  <h1><?php the_title(); ?></h1>
-                  <?php the_content(); ?>
-                  <p><a class="btn btn-lg btn-primary" href="#" role="button">Sign up today</a></p>
-                </div><!-- .carousel-caption -->
-              </div><!-- .container -->
-            </div><!-- .item -->
-            <?php
-            $firstSlideActive = false; // disable slide active class
-          endforeach;
+          if ($esse_slides_query->have_posts()) :
+            while ($esse_slides_query->have_posts()) : $esse_slides_query->the_post();
+              ?>
+
+              <div class="item<?php if ($firstSlideActive) : ?> active<?php endif; ?>">
+                <?php the_post_thumbnail('full', array('alt' => 'slider image')); ?>
+                <div class="container">
+                  <div class="carousel-caption">
+                    <h1><?php the_title(); ?></h1>
+                    <?php the_content(); ?>
+                    <p><a class="btn btn-lg btn-primary" href="#" role="button">Sign up today</a></p>
+                  </div><!-- .carousel-caption -->
+                </div><!-- .container -->
+              </div><!-- .item -->
+              <?php
+              $firstSlideActive = false; // disable slide active class
+            endwhile;
+          endif;
           ?>
         </div><!-- .carousel-inner -->
 

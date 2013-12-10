@@ -75,11 +75,9 @@ class Front_Page_Builder_Admin
      * Read more about actions and filters:
      * http://codex.wordpress.org/Plugin_API#Hooks.2C_Actions_and_Filters
      */
-    // Create custom post type
-    add_action('init', array($this, 'fp_item_create'));
+    // Custom post type is created in public class
 
-    // Define: custom post type, taxonomy, meta box.
-    add_action('init', array($this, 'fp_item_define'));
+    // Metabox for selecting type and save custom post type.
     add_action('add_meta_boxes', array($this, 'fp_item_select_type'));
     add_action('save_post', array($this, 'fp_item_save'));
 
@@ -213,46 +211,6 @@ class Front_Page_Builder_Admin
   }
 
   /**
-   * Create FP Item custom post type
-   * 
-   * @since    1.0.0
-   */
-  public function fp_item_create()
-  {
-    $labels = array(
-        'name'               => __('FP Items', $this->plugin_slug),
-        'singular_name'      => __('FP Item', $this->plugin_slug),
-        'add_new'            => __('Add New FP Item', $this->plugin_slug),
-        'add_new_item'       => __('Add New FP Item', $this->plugin_slug),
-        'edit_item'          => __('Edit FP Item', $this->plugin_slug),
-        'new_item'           => __('New FP Item', $this->plugin_slug),
-        'all_items'          => __('All FP Items', $this->plugin_slug),
-        'view_item'          => __('View FP Item', $this->plugin_slug),
-        'search_items'       => __('Search FP Item', $this->plugin_slug),
-        'not_found'          => __('No FP Item found', $this->plugin_slug),
-        'not_found_in_trash' => __('No FP Item found in Trash', $this->plugin_slug),
-        'parent_item_colon'  => '',
-        'menu_name'          => __('FP Builder', $this->plugin_slug)
-    );
-
-    $args = array(
-        'labels'             => $labels,
-        'public'             => true,
-        'publicly_queryable' => true,
-        'show_ui'            => true,
-        'show_in_menu'       => true,
-        'query_var'          => true,
-        'rewrite'            => true,
-        'has_archive'        => true,
-        'hierarchical'       => false,
-        'menu_position'      => 2,
-        'supports'           => array('title', 'editor', 'thumbnail'),
-        'taxonomies'         => array('fp_item_type')
-    );
-    register_post_type('fp_item', $args);
-  }
-
-  /**
    * Create submenu for slides settings.
    * Menu apper in custom post type (FB Builder menu)
    * 
@@ -283,38 +241,6 @@ class Front_Page_Builder_Admin
     include_once( 'views/slides_submenu.php' );
 
     wp_reset_postdata();
-  }
-
-  /**
-   * Define taxonomy for fp_item. Is fp item: slide or quote.
-   * 
-   * @since   1.0.0
-   */
-  function fp_item_define()
-  {
-    $labels = array(
-        'name'              => __('Type', $this->plugin_slug),
-        'singular_name'     => __('Types', $this->plugin_slug),
-        'search_items'      => __('Search Types', $this->plugin_slug),
-        'all_items'         => __('All Types', $this->plugin_slug),
-        'parent_item'       => __('Parent Type', $this->plugin_slug),
-        'parent_item_colon' => __('Parent Type:', $this->plugin_slug),
-        'edit_item'         => __('Edit Type', $this->plugin_slug),
-        'update_item'       => __('Update Type', $this->plugin_slug),
-        'add_new_item'      => __('Add New Type', $this->plugin_slug),
-        'new_item_name'     => __('New Type Name', $this->plugin_slug),
-        'menu_name'         => __('Type', $this->plugin_slug)
-    );
-
-    $args = array(
-        'labels'       => $labels,
-        'public'       => false,
-        'hierarchical' => false,
-        'query_var'    => true,
-        'rewrite'      => true
-    );
-
-    register_taxonomy('fp_item_type', 'fp_item', $args);
   }
 
   /**
@@ -482,7 +408,7 @@ class Front_Page_Builder_Admin
     update_option('fp_builder_slide_order', $slidesOrder);
 
     // Reset transient
-    $this->transient_set_date();
+    $this->transient_set_data();
   }
 
   /**
@@ -497,7 +423,7 @@ class Front_Page_Builder_Admin
     // Check for cached queries. If none, then execute WP_Query
     if (!( $query = get_transient('esse_fp_builder_query_slides') ))
     {
-      return $this->transient_set_date();
+      return $this->transient_set_data();
     }
     else
     {
@@ -550,7 +476,7 @@ class Front_Page_Builder_Admin
    * 
    * @since   1.0.0
    */
-  private function transient_set_date()
+  private function transient_set_data()
   {
     $query = $this->slides_query();
 

@@ -39,6 +39,15 @@ class Front_Page_Builder_Admin
   protected $plugin_screen_hook_suffix = null;
 
   /**
+   * Slug name of plugin from public class.
+   * 
+   * @since   1.0.0
+   * 
+   * @var     string
+   */
+  protected $plugin_slug;
+
+  /**
    * Initialize the plugin by loading admin scripts & styles and adding a
    * settings page and menu.
    *
@@ -76,7 +85,6 @@ class Front_Page_Builder_Admin
      * http://codex.wordpress.org/Plugin_API#Hooks.2C_Actions_and_Filters
      */
     // Custom post type is created in public class
-
     // Metabox for selecting type and save custom post type.
     add_action('add_meta_boxes', array($this, 'fp_item_select_type'));
     add_action('save_post', array($this, 'fp_item_save'));
@@ -87,7 +95,13 @@ class Front_Page_Builder_Admin
     add_action('trashed_post', array($this, 'slide_delete'));
     add_action('untrashed_post', array($this, 'slide_untrash'));
 
-    add_filter('@TODO', array($this, 'filter_method_name'));
+    // Fill up admin post list columns
+    add_action('manage_fp_item_posts_custom_column', array($this, 'fp_item_admin_table_content'), 10, 2);
+
+    // Create admin post list columns
+    add_filter('manage_fp_item_posts_columns', array($this, 'fp_item_admin_columns'));
+    add_filter('manage_edit-fp_item_sortable_columns', array($this, 'fp_item_admin_columns_sortable'));
+    add_filter('request', array($this, 'fp_item_admin_type_orderby'));
   }
 
   /**
@@ -228,7 +242,7 @@ class Front_Page_Builder_Admin
   }
 
   /**
-   * Display submenu for slides settings.
+   * Display submenu page for slides settings.
    * 
    * @since   1.0.0
    */
@@ -307,6 +321,78 @@ class Front_Page_Builder_Admin
         $this->slides_order_update($slidesOrder);
       }
     }
+  }
+
+  /**
+   * Create table header in admin posts list, with name of fp item type.
+   * http://wp.smashingmagazine.com/2013/12/05/modifying-admin-post-lists-in-wordpress/
+   * 
+   * @param   array $defaults Array with data for displaying table
+   * @return  array $defaults with new Admin Columns Name
+   * 
+   * @since   1.0.0
+   */
+  function fp_item_admin_columns($defaults)
+  {
+    $defaults['fp_item_type'] = __('Type', $this->plugin_slug);
+
+    return $defaults;
+  }
+
+  /**
+   * Fill admin table header with data. Work with function above.
+   * 
+   * @param   string $column_name
+   * @param   int $post_id
+   * 
+   * @since   1.0.0
+   */
+  function fp_item_admin_table_content($column_name, $post_id)
+  {
+    if ($column_name == 'fp_item_type')
+    {
+      $fp_item_type = wp_get_post_terms($post_id, 'fp_item_type', array('fields' => 'names'));
+
+      // Function wp_get_post_terms use only one fields (names)
+      echo $fp_item_type[0];
+    }
+  }
+
+  /**
+   * Sortable columns in admin posts list table.
+   * Set sortable columns adding it to array. 
+   * 
+   * @param   array $columns
+   * @return  array
+   * 
+   * @since   1.0.0
+   */
+  function fp_item_admin_columns_sortable($columns)
+  {
+    $columns['fp_item_type'] = 'fp_item_type';
+
+    return $columns;
+  }
+
+  /**
+   * Modify query when click to sorts columns.
+   * 
+   * @param   array $vars Arguments for wp query
+   * @return  array
+   * 
+   * @since   1.0.0
+   */
+  function fp_item_admin_type_orderby($vars)
+  {
+    if (isset($vars['orderby']) && $vars['orderby'] == 'fp_item_type')
+    {
+      $vars = array_merge($vars, array(
+         // 'fp_item_type' => 'Slide',
+          'orderby'      => 'name'
+      ));
+    }
+
+    return $vars;
   }
 
   /**

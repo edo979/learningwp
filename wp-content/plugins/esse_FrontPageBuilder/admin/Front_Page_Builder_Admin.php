@@ -95,13 +95,15 @@ class Front_Page_Builder_Admin
     add_action('trashed_post', array($this, 'slide_delete'));
     add_action('untrashed_post', array($this, 'slide_untrash'));
 
-    // Fill up admin post list columns
+    // Fill up admin post list columns, filtering by type
     add_action('manage_fp_item_posts_custom_column', array($this, 'fp_item_admin_table_content'), 10, 2);
+    add_action('restrict_manage_posts', array($this, 'fp_item_admin_table_filtering'));
 
-    // Create admin post list columns
+    // Create admin post list columns, ordering by clik on column
     add_filter('manage_fp_item_posts_columns', array($this, 'fp_item_admin_columns'));
     add_filter('manage_edit-fp_item_sortable_columns', array($this, 'fp_item_admin_columns_sortable'));
     add_filter('request', array($this, 'fp_item_admin_type_orderby'));
+    add_filter('parse_query', array($this, 'fp_item_admin_table_filter'));
   }
 
   /**
@@ -375,7 +377,7 @@ class Front_Page_Builder_Admin
   }
 
   /**
-   * Modify query when click to sorts columns.
+   * Modify query when click to sorts columns in admin custom post list table.
    * 
    * @param   array $vars Arguments for wp query
    * @return  array
@@ -387,12 +389,64 @@ class Front_Page_Builder_Admin
     if (isset($vars['orderby']) && $vars['orderby'] == 'fp_item_type')
     {
       $vars = array_merge($vars, array(
-         // 'fp_item_type' => 'Slide',
-          'orderby'      => 'name'
+          // 'fp_item_type' => 'Slide',
+          'orderby' => 'name'
       ));
     }
 
     return $vars;
+  }
+
+  /**
+   * Create filter field on top of table in admin list table for selecting type
+   * of fp_item.
+   * 
+   * @since   1.0.0
+   */
+  function fp_item_admin_table_filtering()
+  {
+    $screen = get_current_screen();
+
+    if ($screen->post_type == 'fp_item')
+    {
+      // Get Terms from custom taxonomy
+      $fp_item_type = get_terms('fp_item_type', array(
+          'orderby'    => 'name',
+          'order'      => 'DESC',
+          'hide_empty' => 0
+      ));
+
+      // Show Terms in input field
+      include_once ('views/_admin_list_select_type.php');
+    }
+  }
+
+  /**
+   * Query for selected fp item type in admin custom post list table. Modifaing
+   * query arguments array by reference.
+   * 
+   * Work with fp_item_admin_table_filtering function above.
+   * 
+   * @param array $query Arguments array for query.
+   * 
+   * @since   1.0.0
+   */
+  function fp_item_admin_table_filter($query)
+  {
+    if (is_admin() AND $query->query['post_type'] == 'fp_item')
+    {
+      $qv = &$query->query_vars;
+      $qv['tax_query'] = array();
+
+      if (!empty($_GET['fp-item-type']))
+      {
+        $qv['tax_query'][] = array(
+            'taxonomy' => 'fp_item_type',
+            'field'    => 'name',
+            'terms'    => $_GET['fp-item-type']
+        );
+      }
+    }
   }
 
   /**
@@ -570,20 +624,6 @@ class Front_Page_Builder_Admin
     set_transient('esse_fp_builder_query_slides', $query, 60 * 60 * 24 * 7 * 4);
 
     return $query;
-  }
-
-  /**
-   * NOTE:     Filters are points of execution in which WordPress modifies data
-   *           before saving it or sending it to the browser.
-   *
-   *           Filters: http://codex.wordpress.org/Plugin_API#Filters
-   *           Reference:  http://codex.wordpress.org/Plugin_API/Filter_Reference
-   *
-   * @since    1.0.0
-   */
-  public function filter_method_name()
-  {
-    // @TODO: Define your filter hook callback here
   }
 
 }
